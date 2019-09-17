@@ -1,0 +1,3 @@
+[submodule "src/github.com/athens"]
+	path = src/github.com/athens
+	url = https://github.com/gomods/athens
