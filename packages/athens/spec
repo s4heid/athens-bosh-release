@@ -1,0 +1,8 @@
+---
+name: athens
+
+dependencies:
+- golang-1.12-linux
+
+files:
+- athens/**/*

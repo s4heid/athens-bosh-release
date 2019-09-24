@@ -1,1 +1,6 @@
-name: athens-bosh
+---
+name: athens
+blobstore:
+  provider: local
+  options:
+    blobstore_path: /tmp/athens-blobs

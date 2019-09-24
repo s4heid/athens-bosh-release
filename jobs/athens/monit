@@ -1,0 +1,5 @@
+check process athens
+  with pidfile /var/vcap/sys/run/bpm/athens/athens.pid
+  start program "/var/vcap/jobs/bpm/bin/bpm start athens"
+  stop program "/var/vcap/jobs/bpm/bin/bpm stop athens"
+  group vcap
