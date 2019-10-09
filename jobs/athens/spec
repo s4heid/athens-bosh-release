@@ -2,7 +2,7 @@
 name: athens
 templates:
   bpm.yml.erb: config/bpm.yml
-  athens.yml.erb: config/athens.yml
+  athens.toml.erb: config/athens.toml
 
 packages:
 - athens

@@ -1,0 +1,37 @@
+---
+name: athens
+
+releases:
+- name: athens
+  version: create
+  url: file://.
+
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+
+update:
+  canaries: 1
+  max_in_flight: 1
+  canary_watch_time: 5000-60000
+  update_watch_time: 5000-60000
+
+instance_groups:
+- name: athens
+  azs: [z1]
+  instances: 1
+  jobs:
+  - name: athens
+    release: athens
+    properties:
+      athens:
+        Storage:
+          Disk:
+            RootPath: /var/vcap/storage/
+  
+  vm_type: default
+  stemcell: default
+  persistent_disk: 10240
+  networks:
+  - name: default

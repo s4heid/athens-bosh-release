@@ -4,14 +4,13 @@ set -eux
 
 source /var/vcap/packages/golang-1.12-linux/bosh/compile.env
 
-
 # TODO: can we get the version from the athens src?
 version="unset"
 built="$( date -u +%Y-%m-%dT%H:%M:%S+00:00 )"
 
 mkdir ../src && mv * ../src/
-mkdir -p src/github.com/s4heid/athens
-mv ../src/athens/* src/github.com/s4heid/athens
+mkdir -p src/github.com/gomods/athens
+mv ../src/athens/* src/github.com/gomods/athens
 
 
 export GO111MODULE=on
@@ -25,4 +24,4 @@ go build \
     -X github.com/gomods/athens/pkg/build.buildDate=$built \
   " \
   -o "$BOSH_INSTALL_TARGET/bin/athens" \
-  github.com/s4heid/athens/cmd/proxy/cmd/proxy
+  github.com/gomods/athens/cmd/proxy
