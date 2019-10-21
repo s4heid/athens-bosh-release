@@ -12,3 +12,5 @@ releases/**/*.tgz
 *~
 *#
 #*
+*.tgz
+.envrc

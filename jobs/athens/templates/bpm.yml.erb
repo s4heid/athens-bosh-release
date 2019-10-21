@@ -4,6 +4,7 @@
         'name' => 'athens',
         'executable' => '/var/vcap/packages/athens/bin/athens',
         'args' => ['-config_file', '/var/vcap/jobs/athens/config/athens.toml'],
+        "persistent_disk" => true
       },
     ]
   }

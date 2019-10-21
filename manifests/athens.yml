@@ -3,19 +3,30 @@ name: athens
 
 releases:
 - name: athens
-  version: create
-  url: file://.
+  version: latest
+  url: git+https://github.com/s4heid/athens-bosh-release
+- name: "bpm"
+  version: "1.0.4"
+  url: "https://bosh.io/d/github.com/cloudfoundry-incubator/bpm-release?v=1.0.4"
+  sha1: "41df19697d6a69d2552bc2c132928157fa91abe0"
 
 stemcells:
 - alias: default
-  os: ubuntu-xenial
+  os: ((os))
   version: latest
 
 update:
   canaries: 1
   max_in_flight: 1
+  serial: false
   canary_watch_time: 5000-60000
   update_watch_time: 5000-60000
+
+addons:
+- name: bpm
+  jobs:
+  - name: bpm
+    release: bpm
 
 instance_groups:
 - name: athens
@@ -25,11 +36,7 @@ instance_groups:
   - name: athens
     release: athens
     properties:
-      athens:
-        Storage:
-          Disk:
-            RootPath: /var/vcap/storage/
-  
+      storage_type: disk
   vm_type: default
   stemcell: default
   persistent_disk: 10240

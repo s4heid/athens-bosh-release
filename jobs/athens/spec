@@ -6,189 +6,187 @@ templates:
 
 packages:
 - athens
+- golang-1.12-linux
 
 properties:
-  athens.GoBinary:
-    description: "GoBinary returns the path to the go binary to use. This value can be a name of a binary in your PATH, or the full path."
-    default: "go"
-  athens.GoEnv:
-    description: "GoEnv specifies the type of environment to run. Supported values are: 'development' and 'production'."
+  go_env:
+    description: "go_env specifies the type of environment to run. Supported values are: 'development' and 'production'."
     default: "development"
-  athens.GoProxy:
-    description: "GoProxy specifies GOPROXY env for go list or mod download inside athens which can be configured totally same with GOPROXY of Go Command. Notes that the comma-separated GOPROXY (e.g. <proxy1>,<proxy2>,direct) is only available in Go 1.13 or higher, otherwise only single proxy URL can be set."
+  go_proxy:
+    description: "go_proxy specifies GOPROXY env for go list or mod download inside athens which can be configured totally same with GOPROXY of Go Command. Notes that the comma-separated GOPROXY (e.g. <proxy1>,<proxy2>,direct) is only available in Go 1.13 or higher, otherwise only single proxy URL can be set."
     default: "direct"
-  athens.GoGetWorkers:
-    description: "GoGetWorkers specifies how many times you can concurrently go mod download, this is so that low performance instances can manage go get more sanely and not run out of disk or memory. One way to think about is: the number of GoGetWorkers corresponds directly to how many parallel 'git clones' your underlying machine can handle."
+  go_get_workers:
+    description: "go_get_workers specifies how many times you can concurrently go mod download, this is so that low performance instances can manage go get more sanely and not run out of disk or memory. One way to think about is: the number of go_get_workers corresponds directly to how many parallel 'git clones' your underlying machine can handle."
     default: 10
-  athens.ProtocolWorkers:
-    description: "ProtocolWorkers specifies how many concurrent requests can you handle at a time for all download protocol paths. This is different from GoGetWorkers in that you can potentially serve 30 requests to the Download Protocol but only 5 at a time can stash a module from Upstream to Storage."
+  protocol_workers:
+    description: "protocol_workers specifies how many concurrent requests can you handle at a time for all download protocol paths. This is different from go_get_workers in that you can potentially serve 30 requests to the Download Protocol but only 5 at a time can stash a module from Upstream to Storage."
     default: 30
-  athens.LogLevel:
-    description: "LogLevel returns the system's exposure to internal logs. Defaults to debug. Supports all logrus log levels (https://github.com/Sirupsen/logrus#level-logging)."
+  log_level:
+    description: "log_level returns the system's exposure to internal logs. Defaults to debug. Supports all logrus log levels (https://github.com/Sirupsen/logrus#level-logging)."
     default: "debug"
-  athens.CloudRuntime:
-    description: "CloudRuntime is the Cloud Provider on which the Proxy/Registry is running. Currently available options are 'GCP', or 'none'."
+  cloud_runtime:
+    description: "cloud_runtime is the Cloud Provider on which the Proxy/Registry is running. Currently available options are 'GCP', or 'none'."
     default: "none"
-  athens.EnablePprof:
-    description: "EnablePprof specifies if the pprof endpoints should be exposed. Note that this option is not meant to be activated forever on a server and should be desactivated once not needed."
+  enable_pprof:
+    description: "enable_pprof specifies if the pprof endpoints should be exposed. Note that this option is not meant to be activated forever on a server and should be desactivated once not needed."
     default: false
-  athens.PprofPort:
-    description: "PprofPort specifies the port on which pprof will be exposed if activated."
+  pprof_port:
+    description: "pprof_port specifies the port on which pprof will be exposed if activated."
     default: ":3001"
-  athens.FilterFile:
+  filter_file:
     description: "The filename for the include exclude filter. To point Athens to an upstream proxy to fetch modules, set GlobalEndpoint to 'https://<url_to_upstream>' and also ensure that FilterFile is  set to a fully qualified file name that contains the letter `D` (for 'Direct Access') in the first line."
     default: ""
-  athens.Timeout:
-    description: "Timeout is the timeout for external network calls in seconds This value is used as the default for storage backends if they don't specify timeouts."
+  timeout:
+    description: "timeout is the timeout for external network calls in seconds This value is used as the default for storage backends if they don't specify timeouts."
     default: 300
-  athens.StorageType:
-    description: "StorageType sets the type of storage backend the proxy will use. Possible values are memory, disk, mongo, gcp, minio, s3, azureblob."
+  storage_type:
+    description: "storage_type sets the type of storage backend the proxy will use. Possible values are memory, disk, mongo, gcp, minio, s3, azureblob."
     default: "memory"
-  athens.Port:
-    description: "Port sets the port the proxy listens on. The PORT must be a number or a number prefixed by ':'."
+  port:
+    description: "port sets the port the proxy listens on. The PORT must be a number or a number prefixed by ':'."
     default: ":3000"
-  athens.GlobalEndpoint:
+  global_endpoint:
     description: "The endpoint for a package registry in case of a proxy cache miss. To point Athens to an upstream proxy to fetch modules, set GlobalEndpoint to 'https://<url_to_upstream>' and also ensure that FilterFile is set to a fully qualified file name that contains the letter `D` (for 'Direct Access') in the first line."
     default: "http://localhost:3001"
-  athens.BasicAuthUser:
+  basic_auth_user:
     description: "Username for basic auth."
     default: ""
-  athens.BasicAuthPass:
+  basic_auth_pass:
     description: "Password for basic auth."
     default: ""
-  athens.ForceSSL:
+  force_ssl:
     description: "Set to true to force an SSL redirect."
     default: false
-  athens.ValidatorHook:
-    description: "ValidatorHook specifies the endpoint to validate modules against. Not used if left blank or not specified."
+  validator_hook:
+    description: "validator_hook specifies the endpoint to validate modules against. Not used if left blank or not specified."
     default: ""
-  athens.PathPrefix:
-    description: "PathPrefix specifies whether the Proxy should have a basepath. Certain proxies and services are distinguished based on subdomain, while others are based on path prefixes."
+  path_prefix:
+    description: "path_prefix specifies whether the Proxy should have a basepath. Certain proxies and services are distinguished based on subdomain, while others are based on path prefixes."
     default: ""
-  athens.NETRCPath:
-    description: "NETRCPath tells you where the .netrc path initially resides. This is so that you can mount the .netrc file to a secret location in the fs system and then move it ~/.netrc. In certain deployments like Kubernetes, we can't mount directly to ~ because it would then clean out whatever is already there as part of the image (such as .cache directory in the Go image)."
+  netrc_path:
+    description: "netrc_path tells you where the .netrc path initially resides. This is so that you can mount the .netrc file to a secret location in the fs system and then move it ~/.netrc. In certain deployments like Kubernetes, we can't mount directly to ~ because it would then clean out whatever is already there as part of the image (such as .cache directory in the Go image)."
     default: ""
-  athens.GithubToken:
-    description: "GithubToken can be used instead of a NETRCPath to authenticate the proxy to your own private repos on github. This makes it easier for users and for platforms like GAE to only be provided a Github token instead of a .netrc file. Internally, the proxy just create a .netrc file for you."
+  github_token:
+    description: "github_token can be used instead of a netrc_path to authenticate the proxy to your own private repos on github. This makes it easier for users and for platforms like GAE to only be provided a Github token instead of a .netrc file. Internally, the proxy just create a .netrc file for you."
     default: ""
-  athens.HGRCPath:
-    description: "HGRCPath tells you where the .hgrc path initially resides. This is so that you can mount the .hgrc file to a secret location in the fs system and then move it ~/.hgrc. In certain deployments like Kubernetes, we can't mount directly to ~ because it would then clean out whatever is already there as part of the image (such as .cache directory in the Go image)."
+  hgrc_path:
+    description: "hgrc_path tells you where the .hgrc path initially resides. This is so that you can mount the .hgrc file to a secret location in the fs system and then move it ~/.hgrc. In certain deployments like Kubernetes, we can't mount directly to ~ because it would then clean out whatever is already there as part of the image (such as .cache directory in the Go image)."
     default: ""
-  athens.TraceExporter:
-    description: "Tracing is not a requirement for Athens. If the infrastructure is not set up, Athens will keep on running and traces won't be exported. TraceExporter is the service to which the data collected by OpenCensus can be exported to. Possible values are: jaeger, datadog, and stackdriver."
+  trace_exporter:
+    description: "Tracing is not a requirement for Athens. If the infrastructure is not set up, Athens will keep on running and traces won't be exported. trace_exporter is the service to which the data collected by OpenCensus can be exported to. Possible values are: jaeger, datadog, and stackdriver."
     default: ""
-  athens.TraceExporterURL:
-    description: "TraceExporterURL is the URL to which Athens populates distributed tracing information such as Jaeger. In Stackdriver, use this as the GCP ProjectID."
+  trace_exporter_url:
+    description: "trace_exporter_url is the URL to which Athens populates distributed tracing information such as Jaeger. In Stackdriver, use this as the GCP project_id."
     default: "http://localhost:14268"
-  athens.StatsExporter:
+  stats_exporter:
     description: "Stats is not a requirement for Athens. If the value is not set, Athens will keep on running and stats won't be collected. Possible values are: prometheus."
     default: "prometheus"
-  athens.SumDBs:
-    description: "SumDBs specifies a list of fully qualified URLs that Athens will proxy so that the go command can use as a checksum verifier. See NoSumDB for enforcing the go command to use GONOSUMDB."
+  sum_dbs:
+    description: "sum_dbs specifies a list of fully qualified URLs that Athens will proxy so that the go command can use as a checksum verifier. See NoSumDB for enforcing the go command to use GONOSUMDB."
     default: ["https://sum.golang.org"]
-  athens.NoSumPatterns:
-    description: "NoSumPatterns specifies a list of patterns that will make the Sum DB proxy return a 403 if any of those patterns match. This will enforce the client to run GONOSUMDB. Example pattern: NoSumPatterns = ['github.com/mycompany/*']"
+  no_sum_patterns:
+    description: "no_sum_patterns specifies a list of patterns that will make the Sum DB proxy return a 403 if any of those patterns match. This will enforce the client to run GONOSUMDB. Example pattern: no_sum_patterns = ['github.com/mycompany/*']"
     default: []
-  athens.DownloadMode:
-    description: "DownloadMode defines how Athens behaves when a module@version is not found in storage. Available options: 'sync', 'async', 'redirect', 'async_redirect', 'none', 'file:<path>', 'custom:<base64-encoded-hcl>'."
+  download_mode:
+    description: "download_mode defines how Athens behaves when a module@version is not found in storage. Available options: 'sync', 'async', 'redirect', 'async_redirect', 'none', 'file:<path>', 'custom:<base64-encoded-hcl>'."
     default: "sync"
-  athens.DownloadURL:
-    description: "DownloadURL is the URL that will be used if DownloadMode is set to 'redirect'."
+  download_url:
+    description: "download_url is the URL that will be used if download_mode is set to 'redirect'."
     default: ""
-  athens.SingleFlightType:
-    description: "SingleFlightType determines what mechanism Athens uses to manage concurrency flowing into the Athens Backend. This is important for the following scenario: if two concurrent requests were made to Athens that wanted to store the same module at the same time, we want to make sure only the first request gets to store the module, and the second request will wait for the first one to finish so that it doesn't override the storage. Options are ['memory', 'etcd', 'redis', 'gcp', 'azureblob']."
+  single_flight_type:
+    description: "single_flight_type determines what mechanism Athens uses to manage concurrency flowing into the Athens Backend. This is important for the following scenario: if two concurrent requests were made to Athens that wanted to store the same module at the same time, we want to make sure only the first request gets to store the module, and the second request will wait for the first one to finish so that it doesn't override the storage. Options are ['memory', 'etcd', 'redis', 'gcp', 'azureblob']."
     default: "memory"
 
   # SingleFlight
-  athens.SingleFlight.Etcd.Endpoints:
-    description: "Endpoints are comma separated URLs that determine all distributed etcd servers. It defaults to what we have in our docker-compose file. It is by default ignored as the SingleFlightType field above determines whether Etcd is used or not."
+  single_flight.etcd.endpoints:
+    description: "endpoints are comma separated URLs that determine all distributed etcd servers. It defaults to what we have in our docker-compose file. It is by default ignored as the single_flight_type field above determines whether etcd is used or not."
     default: "localhost:2379,localhost:22379,localhost:32379"
-  athens.SingleFlight.Redis.Endpoint:
-    description: "Endpoint is the redis endpoint for a SingleFlight lock."
+  single_flight.redis.endpoint:
+    description: "endpoint is the redis endpoint for a single_flight lock."
     default: "127.0.0.1:6379"
 
   # Storage
-  athens.Storage.CDN.Endpoint:
-    description: "Only storage backends that are specified in Proxy.StorageType are required here."
+  storage.cdn.endpoint:
+    description: "Only storage backends that are specified in proxy.storage_type are required here."
     default: "cdn.example.com"
 
-  athens.Storage.Disk.RootPath:
-    description: "RootPath is the Athens Disk Root folder."
-    default: "/path/on/disk"
+  storage.disk.root_path:
+    description: "root_path is the Athens Disk Root folder."
+    default: "/var/vcap/store/athens"
 
-  athens.Storage.GCP.ProjectID:
-    description: "ProjectID to use for GCP Storage."
+  storage.gcp.project_id:
+    description: "Project Id to use for GCP Storage."
     default: "MY_GCP_PROJECT_ID"
-  athens.Storage.GCP.Bucket:
+  storage.gcp.bucket:
     description: "Bucket to use for GCP Storage."
     default: "MY_GCP_BUCKET"
-  athens.Storage.GCP.JSONKey:
-    description: "JSONKey is a base64 encoded service account key that allows Athens to be run outside of GCP but still be able to access GCS. If you are running Athens inside GCP, you will most likely not need this as GCP figures out internal authentication between products for you."
+  storage.gcp.json_key:
+    description: "json_key is a base64 encoded service account key that allows Athens to be run outside of GCP but still be able to access GCS. If you are running Athens inside GCP, you will most likely not need this as GCP figures out internal authentication between products for you."
     default: ""
 
-  athens.Storage.Minio.Endpoint:
+  storage.minio.endpoint:
     description: "Endpoint for Minio storage."
     default: "127.0.0.1:9001"
-  athens.Storage.Minio.Key:
+  storage.minio.key:
     description: "Access Key for Minio storage."
     default: "minio"
-  athens.Storage.Minio.Secret:
+  storage.minio.secret:
     description: "Secret Key for Minio storage."
     default: "minio123"
-  athens.Storage.Minio.EnableSSL:
+  storage.minio.enable_ssl:
     description: "Enable SSL for Minio connections."
     default: false
-  athens.Storage.Minio.Bucket:
+  storage.minio.bucket:
     description: "Minio Bucket to use for storage."
     default: "gomods"
-  athens.Storage.Minio.Region:
+  storage.minio.region:
     description: "Region for Minio storage."
     default: ""
 
-  athens.Storage.Mongo.URL:
+  storage.mongo.url:
     description: "Full connection string for mongo storage."
     default: "mongodb://127.0.0.1:27017"
-  athens.Storage.Mongo.DefaultDBName:
+  storage.mongo.default_db_name:
     description: "Sets default database name for mongo storage if not set by URL."
     default: "athens"
-  athens.Storage.Mongo.CertPath:
+  storage.mongo.cert_path:
     description: "Path to certificate to use for the mongo connection."
     default: ""
-  athens.Storage.Mongo.Insecure:
+  storage.mongo.insecure:
     description: "Allows for insecure SSL / http connections to mongo storage. Should be used for testing or development only."
     default: false
 
-  athens.Storage.S3.Region:
+  storage.s3.region:
     description: "Region for S3 storage."
     default: "MY_AWS_REGION"
-  athens.Storage.S3.Key:
+  storage.s3.key:
     description: "Access Key for S3 storage."
     default: "MY_AWS_ACCESS_KEY_ID"
-  athens.Storage.S3.Secret:
+  storage.s3.secret:
     description: "Secret Key for S3 storage."
     default: "MY_AWS_SECRET_ACCESS_KEY"
-  athens.Storage.S3.Token:
+  storage.s3.token:
     description: "Session Token for S3 storage."
     default: ""
-  athens.Storage.S3.Bucket:
+  storage.s3.bucket:
     description: "S3 Bucket to use for storage."
     default: "MY_S3_BUCKET_NAME"
-  athens.Storage.S3.UseDefaultConfiguration:
+  storage.s3.use_default_configuration:
     description: "If true then the default aws configuration will be used. This will attempt to find credentials in the environment, in the shared configuration (~/.aws/credentials) and from ec2 instance role credentials."
     default: false
-  athens.Storage.S3.CredentialsEndpoint:
+  storage.s3.credentials_endpoint:
     description: "https://docs.aws.amazon.com/sdk-for-go/api/aws/credentials/endpointcreds/"
     default: ""
-  athens.Storage.S3.AwsContainerCredentialsRelativeURI:
-    description: "Conainer relative url (used by fargate). If you are planning to use AWS Fargate, please use http://169.254.170.2 for CredentialsEndpoint."
+  storage.s3.aws_container_credentials_relative_uri:
+    description: "Conainer relative url (used by fargate). If you are planning to use AWS Fargate, please use http://169.254.170.2 for credentials_endpoint."
     default: ""
 
-  athens.Storage.AzureBlob.AccountName:
+  storage.azure_blob.account_name:
     description: "Storage Account name for Azure Blob."
     default: "MY_AZURE_BLOB_ACCOUNT_NAME"
-  athens.Storage.AzureBlob.AccountKey:
+  storage.azure_blob.account_key:
     description: "Account Key to use with the storage account."
     default: "MY_AZURE_BLOB_ACCOUNT_KEY"
-  athens.Storage.AzureBlob.ContainerName:
+  storage.azure_blob.container_name:
     description: "Name of container in the blob storage."
     default: "MY_AZURE_BLOB_CONTAINER_NAME"

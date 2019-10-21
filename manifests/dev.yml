@@ -1,0 +1,7 @@
+- type: replace
+  path: /releases/name=athens/url
+  value: file://.
+
+- type: replace
+  path: /releases/name=athens/version
+  value: create

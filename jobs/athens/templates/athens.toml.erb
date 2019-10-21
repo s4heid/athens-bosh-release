@@ -1,69 +1,69 @@
-GoBinary = <%= p('athens.GoBinary') %>
-GoEnv = <%= p('athens.GoEnv') %>
-GoProxy = <%= p('athens.GoProxy') %>
-GoGetWorkers = <%= p('athens.GoGetWorkers') %>
-ProtocolWorkers = <%= p('athens.ProtocolWorkers') %>
-LogLevel = <%= p('athens.LogLevel') %>
-CloudRuntime = <%= p('athens.CloudRuntime') %>
-EnablePprof = <%= p('athens.EnablePprof') %>
-PprofPort = <%= p('athens.PprofPort') %>
-FilterFile = <%= p('athens.FilterFile') %>
-Timeout = <%= p('athens.Timeout') %>
-StorageType = <%= p('athens.StorageType') %>
-Port = <%= p('athens.Port') %>
-GlobalEndpoint = <%= p('athens.GlobalEndpoint') %>
-BasicAuthUser = <%= p('athens.BasicAuthUser') %>
-BasicAuthPass = <%= p('athens.BasicAuthPass') %>
-ForceSSL = <%= p('athens.ForceSSL') %>
-ValidatorHook = <%= p('athens.ValidatorHook') %>
-PathPrefix = <%= p('athens.PathPrefix') %>
-NETRCPath = <%= p('athens.NETRCPath') %>
-GithubToken = <%= p('athens.GithubToken') %>
-HGRCPath = <%= p('athens.HGRCPath') %>
-TraceExporter = <%= p('athens.TraceExporter') %>
-TraceExporterURL = <%= p('athens.TraceExporterURL') %>
-StatsExporter = <%= p('athens.StatsExporter') %>
-SumDBs = <%= p('athens.SumDBs') %>
-NoSumPatterns = <%= p('athens.NoSumPatterns') %>
-DownloadMode = <%= p('athens.DownloadMode') %>
-DownloadURL = <%= p('athens.DownloadURL') %>
-SingleFlightType = <%= p('athens.SingleFlightType') %>
+GoBinary = "/var/vcap/packages/golang-1.12-linux/bin/go"
+GoEnv = "<%= p('go_env') %>"
+GoProxy = "<%= p('go_proxy') %>"
+GoGetWorkers = <%= p('go_get_workers') %>
+ProtocolWorkers = <%= p('protocol_workers') %>
+LogLevel = "<%= p('log_level') %>"
+CloudRuntime = "<%= p('cloud_runtime') %>"
+EnablePprof = <%= p('enable_pprof') %>
+PprofPort = "<%= p('pprof_port') %>"
+FilterFile = "<%= p('filter_file') %>"
+Timeout = <%= p('timeout') %>
+StorageType = "<%= p('storage_type') %>"
+Port = "<%= p('port') %>"
+GlobalEndpoint = "<%= p('global_endpoint') %>"
+BasicAuthUser = "<%= p('basic_auth_user') %>"
+BasicAuthPass = "<%= p('basic_auth_pass') %>"
+ForceSSL = <%= p('force_ssl') %>
+ValidatorHook = "<%= p('validator_hook') %>"
+PathPrefix = "<%= p('path_prefix') %>"
+NETRCPath = "<%= p('netrc_path') %>"
+GithubToken = "<%= p('github_token') %>"
+HGRCPath = "<%= p('hgrc_path') %>"
+TraceExporter = "<%= p('trace_exporter') %>"
+TraceExporterURL = "<%= p('trace_exporter_url') %>"
+StatsExporter = "<%= p('stats_exporter') %>"
+SumDBs = <%= p('sum_dbs') %>
+NoSumPatterns = <%= p('no_sum_patterns') %>
+DownloadMode = "<%= p('download_mode') %>"
+DownloadURL = "<%= p('download_url') %>"
+SingleFlightType = "<%= p('single_flight_type') %>"
 [SingleFlight]
     [SingleFlight.Etcd]
-        Endpoints = <%= p('athens.SingleFlight.Etcd.Endpoints') %>
+        Endpoints = "<%= p('single_flight.etcd.endpoints') %>"
     [SingleFlight.Redis]
-        Endpoint = <%= p('athens.SingleFlight.Redis.Endpoint') %>
+        Endpoint = "<%= p('single_flight.redis.endpoint') %>"
 [Storage]
     [Storage.CDN]
-        Endpoint = <%= p('athens.Storage.CDN.Endpoint') %>
+        Endpoint = "<%= p('storage.cdn.endpoint') %>"
     [Storage.Disk]
-        RootPath = <%= p('athens.Storage.Disk.RootPath') %>
+        RootPath = "<%= p('storage.disk.root_path') %>"
     [Storage.GCP]
-        ProjectID = <%= p('athens.Storage.GCP.ProjectID') %>
-        Bucket = <%= p('athens.Storage.GCP.Bucket') %>
-        JSONKey = <%= p('athens.Storage.GCP.JSONKey') %>
+        ProjectID = "<%= p('storage.gcp.project_id') %>"
+        Bucket = "<%= p('storage.gcp.bucket') %>"
+        JSONKey = "<%= p('storage.gcp.json_key') %>"
     [Storage.Minio]
-        Endpoint = <%= p('athens.Storage.Minio.Endpoint') %>
-        Key = <%= p('athens.Storage.Minio.Key') %>
-        Secret = <%= p('athens.Storage.Minio.Secret') %>
-        EnableSSL = <%= p('athens.Storage.Minio.EnableSSL') %>
-        Bucket = <%= p('athens.Storage.Minio.Bucket') %>
-        Region = <%= p('athens.Storage.Minio.Region') %>
+        Endpoint = "<%= p('storage.minio.endpoint') %>"
+        Key = "<%= p('storage.minio.key') %>"
+        Secret = "<%= p('storage.minio.secret') %>"
+        EnableSSL = <%= p('storage.minio.enable_ssl') %>
+        Bucket = "<%= p('storage.minio.bucket') %>"
+        Region = "<%= p('storage.minio.region') %>"
     [Storage.Mongo]
-        URL = <%= p('athens.Storage.Mongo.URL') %>
-        DefaultDBName = <%= p('athens.Storage.Mongo.DefaultDBName') %>
-        CertPath = <%= p('athens.Storage.Mongo.CertPath') %>
-        Insecure = <%= p('athens.Storage.Mongo.Insecure') %>
+        URL = "<%= p('storage.mongo.url') %>"
+        DefaultDBName = "<%= p('storage.mongo.default_db_name') %>"
+        CertPath = "<%= p('storage.mongo.cert_path') %>"
+        Insecure = <%= p('storage.mongo.insecure') %>
     [Storage.S3]
-        Region = <%= p('athens.Storage.S3.Region') %>
-        Key = <%= p('athens.Storage.S3.Key') %>
-        Secret = <%= p('athens.Storage.S3.Secret') %>
-        Token = <%= p('athens.Storage.S3.Token') %>
-        Bucket = <%= p('athens.Storage.S3.Bucket') %>
-        UseDefaultConfiguration = <%= p('athens.Storage.S3.UseDefaultConfiguration') %>
-        CredentialsEndpoint = <%= p('athens.Storage.S3.CredentialsEndpoint') %>
-        AwsContainerCredentialsRelativeURI = <%= p('athens.Storage.S3.AwsContainerCredentialsRelativeURI') %>
+        Region = "<%= p('storage.s3.region') %>"
+        Key = "<%= p('storage.s3.key') %>"
+        Secret = "<%= p('storage.s3.secret') %>"
+        Token = "<%= p('storage.s3.token') %>"
+        Bucket = "<%= p('storage.s3.bucket') %>"
+        UseDefaultConfiguration = <%= p('storage.s3.use_default_configuration') %>
+        CredentialsEndpoint = "<%= p('storage.s3.credentials_endpoint') %>"
+        AwsContainerCredentialsRelativeURI = "<%= p('storage.s3.aws_container_credentials_relative_uri') %>"
    [Storage.AzureBlob]
-        AccountName = <%= p('athens.Storage.AzureBlob.AccountName') %>
-        AccountKey = <%= p('athens.Storage.AzureBlob.AccountKey') %>
-        ContainerName = <%= p('athens.Storage.AzureBlob.ContainerName') %>
+        AccountName = "<%= p('storage.azure_blob.account_name') %>"
+        AccountKey = "<%= p('storage.azure_blob.account_key') %>"
+        ContainerName = "<%= p('storage.azure_blob.container_name') %>"
