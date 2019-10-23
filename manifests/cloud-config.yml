@@ -1,0 +1,11 @@
+---
+networks:
+- name: vip
+  type: vip
+
+vm_extensions:
+- name: athens
+  cloud_properties:
+    security_groups:
+    - ((athens_security_group.value))
+    - ((default_security_group))

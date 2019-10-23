@@ -1,6 +1,7 @@
 ---
 name: athens
 templates:
+  pre-start: bin/pre-start
   bpm.yml.erb: config/bpm.yml
   athens.toml.erb: config/athens.toml
 

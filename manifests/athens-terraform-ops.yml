@@ -1,0 +1,13 @@
+- type: replace
+  path: /instance_groups/name=athens/networks/-
+  value:
+    name: vip
+    static_ips: [((external_ip.value))]
+
+- type: replace
+  path: /instance_groups/name=athens/vm_extensions?/-
+  value: athens
+
+- type: replace
+  path: /instance_groups/name=athens/networks/0/default?
+  value: [dns, gateway]
