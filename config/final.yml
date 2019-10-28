@@ -1,6 +1,7 @@
 ---
-name: athens
 blobstore:
-  provider: local
+  provider: s3
   options:
-    blobstore_path: /tmp/athens-blobs
+    bucket_name: athens-proxy-blobs
+    region: eu-central-1
+    host: s3-eu-central-1.amazonaws.com
