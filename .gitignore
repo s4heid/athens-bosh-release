@@ -1,3 +1,4 @@
+### BOSH ###
 config/private.yml
 blobs
 dev_releases
@@ -12,8 +13,14 @@ releases/**/*.tgz
 *~
 *#
 #*
+
+### Terraform ###
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+
+### Others ###
 *.tgz
 .envrc
-*.tfvars
-*.tfstate
-.terraform

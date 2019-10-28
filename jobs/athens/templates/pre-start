@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -e
-
-if ! command -v git; then
-    apt-get update && apt-get -y install git
-fi

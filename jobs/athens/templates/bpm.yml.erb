@@ -2,8 +2,7 @@
   config = {
     'processes' => [{
         'name' => 'athens',
-        'executable' => '/var/vcap/packages/athens/bin/athens',
-        'args' => ['-config_file', '/var/vcap/jobs/athens/config/athens.toml'],
+        'executable' => '/var/vcap/jobs/athens/bin/run-athens',
         'persistent_disk' => true
       },
     ]

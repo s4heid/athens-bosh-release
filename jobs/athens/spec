@@ -1,12 +1,13 @@
 ---
 name: athens
 templates:
-  pre-start: bin/pre-start
   bpm.yml.erb: config/bpm.yml
   athens.toml.erb: config/athens.toml
+  run-athens: bin/run-athens
 
 packages:
 - athens
+- git
 - golang-1.12-linux
 
 properties:
