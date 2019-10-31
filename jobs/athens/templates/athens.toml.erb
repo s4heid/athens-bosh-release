@@ -16,9 +16,6 @@ BasicAuthPass = "<%= p('basic_auth_pass') %>"
 ForceSSL = <%= p('force_ssl') %>
 ValidatorHook = "<%= p('validator_hook') %>"
 PathPrefix = "<%= p('path_prefix') %>"
-NETRCPath = "<%= p('netrc_path') %>"
-GithubToken = "<%= p('github_token') %>"
-HGRCPath = "<%= p('hgrc_path') %>"
 TraceExporter = "<%= p('trace_exporter') %>"
 TraceExporterURL = "<%= p('trace_exporter_url') %>"
 StatsExporter = "<%= p('stats_exporter') %>"
@@ -35,8 +32,6 @@ SingleFlightType = "<%= p('single_flight_type') %>"
 [Storage]
     [Storage.CDN]
         Endpoint = "<%= p('storage.cdn.endpoint') %>"
-    [Storage.Disk]
-        RootPath = "<%= p('storage.disk.root_path') %>"
     [Storage.GCP]
         ProjectID = "<%= p('storage.gcp.project_id') %>"
         Bucket = "<%= p('storage.gcp.bucket') %>"

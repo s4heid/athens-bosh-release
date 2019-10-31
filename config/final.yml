@@ -1,4 +1,5 @@
 ---
+name: athens
 blobstore:
   provider: s3
   options:

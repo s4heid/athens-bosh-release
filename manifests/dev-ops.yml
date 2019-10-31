@@ -5,7 +5,3 @@
 - type: replace
   path: /releases/name=athens/version
   value: create
-
-- type: replace
-  path: /instance_groups/name=athens/vm_type
-  value: t2.small

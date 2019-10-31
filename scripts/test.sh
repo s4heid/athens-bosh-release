@@ -46,28 +46,13 @@ bosh deploy \
     "${ops_files[@]}" \
     ./manifests/athens.yml
 
-info "Run test application"
-go get github.com/s4heid/walkthrough
-go clean -modcache
-
-host="$(terraform output -state="$terraform_state_dir" -json | jq -r .external_ip.value)"
-export GOPROXY="http://${host}:3000"
-export GO111MODULE=on
-
-pushd "$(go env GOPATH)"/src/github.com/s4heid/walkthrough
-go run .
-popd
-
-disk_version="$(curl -s "http://${host}:3000/catalog" | jq -r '.modules[]|select(.module=="github.com/athens-artifacts/samplelib").version')"
-if [ "$disk_version" != "v1.0.0" ]; then
-    >&2 echo "app dependencies not found on athens disk"
-    exit 1
-else
-    echo "found $disk_version on athens disk"
-fi
+info "Running tests with an errand"
+bosh run-errand --keep-alive athens-test-errand
 
 info "Cleaning up"
 bosh delete-deployment
 bosh clean-up --all
 
 popd > /dev/null
+
+info "Done"

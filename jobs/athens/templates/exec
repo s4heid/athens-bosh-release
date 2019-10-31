@@ -2,8 +2,11 @@
 
 source /var/vcap/packages/golang-1.12-linux/bosh/runtime.env
 
-export GO_BINARY_PATH=/var/vcap/packages/golang-1.12-linux/bin/go
 export PATH=/var/vcap/packages/git/bin:$PATH
+export GO_BINARY_PATH=/var/vcap/packages/golang-1.12-linux/bin/go
+if [ "<%= p('storage_type') %>" = "disk" ]; then
+  export ATHENS_DISK_STORAGE_ROOT=/var/vcap/store/athens
+fi
 
 exec /var/vcap/packages/athens/bin/athens \
   -config_file /var/vcap/jobs/athens/config/athens.toml

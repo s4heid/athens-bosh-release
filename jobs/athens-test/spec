@@ -1,0 +1,12 @@
+---
+name: athens-test
+
+templates:
+  run: bin/run
+
+consumes:
+- name: athens
+  type: athens
+
+packages:
+- golang-1.12-linux

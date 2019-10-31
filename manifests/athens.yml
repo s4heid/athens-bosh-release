@@ -41,4 +41,18 @@ instance_groups:
   stemcell: default
   persistent_disk: 10240
   networks:
-  - name: default
+  - name: athens
+    default: [dns, gateway]
+- name: athens-test-errand
+  azs: [z1]
+  instances: 1
+  jobs:
+  - name: athens-test
+    release: athens
+    properties: {}
+  vm_type: default
+  stemcell: default
+  lifecycle: errand
+  networks:
+  - name: athens
+    default: [dns, gateway]

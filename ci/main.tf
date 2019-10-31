@@ -11,8 +11,17 @@ variable "vpc_id" {
   type = string
 }
 
+variable "vpc_cidr" {
+  type = string
+}
+
+variable "availability_zone" {
+  type    = string
+  default = "eu-central-1a"
+}
+
 provider "aws" {
-  region     = var.region
+  region = var.region
 }
 
 #
@@ -65,6 +74,10 @@ output "athens_secret_key" {
 
 resource "aws_eip" "athens_eip" {
   vpc = true
+
+  tags = {
+    Name = var.env_name
+  }
 }
 
 resource "aws_security_group" "athens_sg" {
@@ -76,6 +89,7 @@ resource "aws_security_group" "athens_sg" {
     from_port = 3000
     to_port   = 3000
     protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -84,6 +98,53 @@ resource "aws_security_group" "athens_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = var.env_name
+  }
+}
+
+data "aws_internet_gateway" "default" {
+  filter {
+    name = "attachment.vpc-id"
+    values = [var.vpc_id]
+  }
+}
+
+resource "aws_subnet" "athens_subnet" {
+  vpc_id            = var.vpc_id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, 144)
+  availability_zone = var.availability_zone
+  depends_on        = [data.aws_internet_gateway.default]
+
+  tags = {
+    Name = var.env_name
+  }
+}
+
+resource "aws_route_table" "athens_route_table" {
+  vpc_id = var.vpc_id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = data.aws_internet_gateway.default.id
+  }
+
+  tags = {
+    Name = var.env_name
+  }
+}
+
+resource "aws_route_table_association" "athens_route_table_association" {
+  subnet_id      = aws_subnet.athens_subnet.id
+  route_table_id = aws_route_table.athens_route_table.id
+}
+
+output "athens_subnet_cidr" {
+  value = aws_subnet.athens_subnet.cidr_block
+}
+
+output "athens_subnet_id" {
+  value = aws_subnet.athens_subnet.id
 }
 
 output "external_ip" {

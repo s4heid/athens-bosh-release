@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -eu
+
+source /var/vcap/packages/golang-1.12-linux/bosh/runtime.env
+
+<% athens = link('athens') %>
+export GOPROXY="http://<%= athens.address %><%= athens.p('port') %>"
+export GO111MODULE=on
+
+moddir=/var/vcap/data/tmp/athens-test/modtest
+
+rm -fr "$moddir"
+go clean -modcache
+
+mkdir -p "$moddir"
+cd "$moddir"
+
+cat > main.go <<EOF
+package main
+
+import (
+	"fmt"
+
+	"github.com/athens-artifacts/samplelib"
+)
+
+func main() {
+	fmt.Println(samplelib.Hello())
+}
+EOF
+
+go mod init main
+go run ./
+
+if ! curl -s ${GOPROXY}/catalog | grep -q "github.com/athens-artifacts/samplelib"; then
+	>&2 echo "ERROR: expected catalog endpoint to list samplelib dependency"
+	exit 1
+fi

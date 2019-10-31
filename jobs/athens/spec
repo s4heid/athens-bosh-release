@@ -3,7 +3,13 @@ name: athens
 templates:
   bpm.yml.erb: config/bpm.yml
   athens.toml.erb: config/athens.toml
-  run-athens: bin/run-athens
+  exec: bin/exec
+
+provides:
+- name: athens
+  type: athens
+  properties:
+  - port
 
 packages:
 - athens
@@ -65,15 +71,6 @@ properties:
   path_prefix:
     description: "path_prefix specifies whether the Proxy should have a basepath. Certain proxies and services are distinguished based on subdomain, while others are based on path prefixes."
     default: ""
-  netrc_path:
-    description: "netrc_path tells you where the .netrc path initially resides. This is so that you can mount the .netrc file to a secret location in the fs system and then move it ~/.netrc. In certain deployments like Kubernetes, we can't mount directly to ~ because it would then clean out whatever is already there as part of the image (such as .cache directory in the Go image)."
-    default: ""
-  github_token:
-    description: "github_token can be used instead of a netrc_path to authenticate the proxy to your own private repos on github. This makes it easier for users and for platforms like GAE to only be provided a Github token instead of a .netrc file. Internally, the proxy just create a .netrc file for you."
-    default: ""
-  hgrc_path:
-    description: "hgrc_path tells you where the .hgrc path initially resides. This is so that you can mount the .hgrc file to a secret location in the fs system and then move it ~/.hgrc. In certain deployments like Kubernetes, we can't mount directly to ~ because it would then clean out whatever is already there as part of the image (such as .cache directory in the Go image)."
-    default: ""
   trace_exporter:
     description: "Tracing is not a requirement for Athens. If the infrastructure is not set up, Athens will keep on running and traces won't be exported. trace_exporter is the service to which the data collected by OpenCensus can be exported to. Possible values are: jaeger, datadog, and stackdriver."
     default: ""
@@ -111,10 +108,6 @@ properties:
   storage.cdn.endpoint:
     description: "Only storage backends that are specified in proxy.storage_type are required here."
     default: "cdn.example.com"
-
-  storage.disk.root_path:
-    description: "root_path is the Athens Disk Root folder."
-    default: "/var/vcap/store/athens"
 
   storage.gcp.project_id:
     description: "Project Id to use for GCP Storage."
