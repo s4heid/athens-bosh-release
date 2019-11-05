@@ -12,3 +12,11 @@
 - type: replace
   path: /instance_groups/name=athens/networks/0/default?
   value: [dns, gateway]
+
+- type: replace
+  path: /instance_groups/name=athens/networks/0/name?
+  value: athens
+
+- type: replace
+  path: /instance_groups/name=athens-test-errand/networks/0/name?
+  value: athens

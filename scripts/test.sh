@@ -43,6 +43,7 @@ fi
 info "Deploying $BOSH_DEPLOYMENT"
 bosh deploy \
     --ops-file=./manifests/operations/dev-ops.yml \
+    --var=repo_dir="$PWD" \
     --var=os="${stemcell_os}" \
     --vars-file=<(terraform output -state=ci/terraform.tfstate -json) \
     "${ops_files[@]}" \

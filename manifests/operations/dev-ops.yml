@@ -1,7 +1,7 @@
 ---
 - type: replace
   path: /releases/name=athens/url
-  value: file://.
+  value: file://((repo_dir))
 
 - type: replace
   path: /releases/name=athens/version

@@ -39,9 +39,9 @@ instance_groups:
       storage_type: disk
   vm_type: default
   stemcell: default
-  persistent_disk: 10240
+  persistent_disk: 1024
   networks:
-  - name: athens
+  - name: default
 - name: athens-test-errand
   azs: [z1]
   instances: 1
@@ -53,4 +53,4 @@ instance_groups:
   stemcell: default
   lifecycle: errand
   networks:
-  - name: athens
+  - name: default
