@@ -4,8 +4,14 @@ source /var/vcap/packages/golang-1.12-linux/bosh/runtime.env
 
 export PATH=/var/vcap/packages/git/bin:$PATH
 export GO_BINARY_PATH=/var/vcap/packages/golang-1.12-linux/bin/go
+
 if [ "<%= p('storage_type') %>" = "disk" ]; then
   export ATHENS_DISK_STORAGE_ROOT=/var/vcap/store/athens
+fi
+
+if [ "<%= p('tls.cert') %>" != "" ] && [ "<%= p('tls.key') %>" != "" ]; then
+  export ATHENS_TLSCERT_FILE=/var/vcap/jobs/athens/config/server.crt
+  export ATHENS_TLSKEY_FILE=/var/vcap/jobs/athens/config/server.key
 fi
 
 exec /var/vcap/packages/athens/bin/athens \

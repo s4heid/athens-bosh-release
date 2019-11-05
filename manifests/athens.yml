@@ -42,7 +42,6 @@ instance_groups:
   persistent_disk: 10240
   networks:
   - name: athens
-    default: [dns, gateway]
 - name: athens-test-errand
   azs: [z1]
   instances: 1
@@ -55,4 +54,3 @@ instance_groups:
   lifecycle: errand
   networks:
   - name: athens
-    default: [dns, gateway]

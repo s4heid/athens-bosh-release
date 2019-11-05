@@ -18,10 +18,3 @@ networks:
     static:
     - 10.0.144.190-10.0.144.254
   type: manual
-
-# vm_extensions:
-# - name: athens
-#   cloud_properties:
-#     security_groups:
-#     - ((athens_security_group.value))
-#     - ((default_security_group))

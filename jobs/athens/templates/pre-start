@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+config_dir=/var/vcap/jobs/director/config
+tls_private_key=/var/vcap/jobs/athens/config/server.key
+
+mkdir -p $config_dir
+chmod -R 0640 $config_dir
+chown -R root:vcap $config_dir
+
+# Changing the owner and permission for the private key used in TLS connections. 
+# The reason is that athens does not allow a more privileged permission for the 
+# private key that is greater or equal than 0777.
+# Refer to https://github.com/gomods/athens/blob/90b3c1dc970ef41d638bf8ba36664a60129e52a4/pkg/config/config.go#L172-L174
+chmod 0600 $tls_private_key
+chown vcap:vcap $tls_private_key

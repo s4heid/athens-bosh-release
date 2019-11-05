@@ -1,9 +1,12 @@
 ---
 name: athens
 templates:
-  bpm.yml.erb: config/bpm.yml
   athens.toml.erb: config/athens.toml
+  bpm.yml.erb: config/bpm.yml
   exec: bin/exec
+  pre-start: bin/pre-start
+  server.crt.erb: config/server.crt
+  server.key.erb: config/server.key
 
 provides:
 - name: athens
@@ -18,40 +21,40 @@ packages:
 
 properties:
   go_env:
-    description: "go_env specifies the type of environment to run. Supported values are: 'development' and 'production'."
+    description: "Specifies the type of environment to run. Supported values are: 'development' and 'production'."
     default: "development"
   go_proxy:
-    description: "go_proxy specifies GOPROXY env for go list or mod download inside athens which can be configured totally same with GOPROXY of Go Command. Notes that the comma-separated GOPROXY (e.g. <proxy1>,<proxy2>,direct) is only available in Go 1.13 or higher, otherwise only single proxy URL can be set."
+    description: "Specifies GOPROXY env for go list or mod download inside athens which can be configured totally same with GOPROXY of Go Command. Notes that the comma-separated GOPROXY (e.g. <proxy1>,<proxy2>,direct) is only available in Go 1.13 or higher, otherwise only single proxy URL can be set."
     default: "direct"
   go_get_workers:
-    description: "go_get_workers specifies how many times you can concurrently go mod download, this is so that low performance instances can manage go get more sanely and not run out of disk or memory. One way to think about is: the number of go_get_workers corresponds directly to how many parallel 'git clones' your underlying machine can handle."
+    description: "Specifies how many times you can concurrently go mod download, this is so that low performance instances can manage go get more sanely and not run out of disk or memory. One way to think about is: the number of go_get_workers corresponds directly to how many parallel 'git clones' your underlying machine can handle."
     default: 10
   protocol_workers:
-    description: "protocol_workers specifies how many concurrent requests can you handle at a time for all download protocol paths. This is different from go_get_workers in that you can potentially serve 30 requests to the Download Protocol but only 5 at a time can stash a module from Upstream to Storage."
+    description: "Specifies how many concurrent requests can you handle at a time for all download protocol paths. This is different from go_get_workers in that you can potentially serve 30 requests to the Download Protocol but only 5 at a time can stash a module from Upstream to Storage."
     default: 30
   log_level:
-    description: "log_level returns the system's exposure to internal logs. Defaults to debug. Supports all logrus log levels (https://github.com/Sirupsen/logrus#level-logging)."
+    description: "Returns the system's exposure to internal logs. Defaults to debug. Supports all logrus log levels (https://github.com/Sirupsen/logrus#level-logging)."
     default: "debug"
   cloud_runtime:
-    description: "cloud_runtime is the Cloud Provider on which the Proxy/Registry is running. Currently available options are 'GCP', or 'none'."
+    description: "The Cloud Provider on which the Proxy/Registry is running. Currently available options are 'GCP', or 'none'."
     default: "none"
   enable_pprof:
-    description: "enable_pprof specifies if the pprof endpoints should be exposed. Note that this option is not meant to be activated forever on a server and should be desactivated once not needed."
+    description: "Specifies if the pprof endpoints should be exposed. Note that this option is not meant to be activated forever on a server and should be desactivated once not needed."
     default: false
   pprof_port:
-    description: "pprof_port specifies the port on which pprof will be exposed if activated."
+    description: "Specifies the port on which pprof will be exposed if activated."
     default: ":3001"
   filter_file:
     description: "The filename for the include exclude filter. To point Athens to an upstream proxy to fetch modules, set GlobalEndpoint to 'https://<url_to_upstream>' and also ensure that FilterFile is  set to a fully qualified file name that contains the letter `D` (for 'Direct Access') in the first line."
     default: ""
   timeout:
-    description: "timeout is the timeout for external network calls in seconds This value is used as the default for storage backends if they don't specify timeouts."
+    description: "The timeout for external network calls in seconds This value is used as the default for storage backends if they don't specify timeouts."
     default: 300
   storage_type:
-    description: "storage_type sets the type of storage backend the proxy will use. Possible values are memory, disk, mongo, gcp, minio, s3, azureblob."
+    description: "Sets the type of storage backend the proxy will use. Possible values are memory, disk, mongo, gcp, minio, s3, azureblob."
     default: "memory"
   port:
-    description: "port sets the port the proxy listens on. The PORT must be a number or a number prefixed by ':'."
+    description: "Sets the port the proxy listens on. The PORT must be a number or a number prefixed by ':'."
     default: ":3000"
   global_endpoint:
     description: "The endpoint for a package registry in case of a proxy cache miss. To point Athens to an upstream proxy to fetch modules, set GlobalEndpoint to 'https://<url_to_upstream>' and also ensure that FilterFile is set to a fully qualified file name that contains the letter `D` (for 'Direct Access') in the first line."
@@ -66,42 +69,49 @@ properties:
     description: "Set to true to force an SSL redirect."
     default: false
   validator_hook:
-    description: "validator_hook specifies the endpoint to validate modules against. Not used if left blank or not specified."
+    description: "Specifies the endpoint to validate modules against. Not used if left blank or not specified."
     default: ""
   path_prefix:
-    description: "path_prefix specifies whether the Proxy should have a basepath. Certain proxies and services are distinguished based on subdomain, while others are based on path prefixes."
+    description: "Specifies whether the Proxy should have a basepath. Certain proxies and services are distinguished based on subdomain, while others are based on path prefixes."
     default: ""
   trace_exporter:
-    description: "Tracing is not a requirement for Athens. If the infrastructure is not set up, Athens will keep on running and traces won't be exported. trace_exporter is the service to which the data collected by OpenCensus can be exported to. Possible values are: jaeger, datadog, and stackdriver."
+    description: "The service to which the data collected by OpenCensus can be exported to. Possible values are: 'jaeger', 'datadog', and 'stackdriver'."
     default: ""
   trace_exporter_url:
-    description: "trace_exporter_url is the URL to which Athens populates distributed tracing information such as Jaeger. In Stackdriver, use this as the GCP project_id."
+    description: "The URL to which Athens populates distributed tracing information such as Jaeger. In Stackdriver, use this as the GCP project_id."
     default: "http://localhost:14268"
   stats_exporter:
     description: "Stats is not a requirement for Athens. If the value is not set, Athens will keep on running and stats won't be collected. Possible values are: prometheus."
     default: "prometheus"
   sum_dbs:
-    description: "sum_dbs specifies a list of fully qualified URLs that Athens will proxy so that the go command can use as a checksum verifier. See NoSumDB for enforcing the go command to use GONOSUMDB."
+    description: "Specifies a list of fully qualified URLs that Athens will proxy so that the go command can use as a checksum verifier. See NoSumDB for enforcing the go command to use GONOSUMDB."
     default: ["https://sum.golang.org"]
   no_sum_patterns:
-    description: "no_sum_patterns specifies a list of patterns that will make the Sum DB proxy return a 403 if any of those patterns match. This will enforce the client to run GONOSUMDB. Example pattern: no_sum_patterns = ['github.com/mycompany/*']"
+    description: "Specifies a list of patterns that will make the Sum DB proxy return a 403 if any of those patterns match. This will enforce the client to run GONOSUMDB. Example pattern: no_sum_patterns = ['github.com/mycompany/*']"
     default: []
   download_mode:
-    description: "download_mode defines how Athens behaves when a module@version is not found in storage. Available options: 'sync', 'async', 'redirect', 'async_redirect', 'none', 'file:<path>', 'custom:<base64-encoded-hcl>'."
+    description: "Defines how Athens behaves when a module@version is not found in storage. Available options: 'sync', 'async', 'redirect', 'async_redirect', 'none', 'file:<path>', 'custom:<base64-encoded-hcl>'."
     default: "sync"
   download_url:
-    description: "download_url is the URL that will be used if download_mode is set to 'redirect'."
+    description: "The URL that will be used if download_mode is set to 'redirect'."
     default: ""
   single_flight_type:
-    description: "single_flight_type determines what mechanism Athens uses to manage concurrency flowing into the Athens Backend. This is important for the following scenario: if two concurrent requests were made to Athens that wanted to store the same module at the same time, we want to make sure only the first request gets to store the module, and the second request will wait for the first one to finish so that it doesn't override the storage. Options are ['memory', 'etcd', 'redis', 'gcp', 'azureblob']."
+    description: "Determines what mechanism Athens uses to manage concurrency flowing into the Athens Backend. This is important for the following scenario: if two concurrent requests were made to Athens that wanted to store the same module at the same time, we want to make sure only the first request gets to store the module, and the second request will wait for the first one to finish so that it doesn't override the storage. Options are ['memory', 'etcd', 'redis', 'gcp', 'azureblob']."
     default: "memory"
+
+  tls.cert:
+    description: "The tls certificate for making athens serve using https instead of plain text http."
+    default: ""
+  tls.key:
+    description: "The tls private key for making athens serve using https instead of plain text http."
+    default: ""
 
   # SingleFlight
   single_flight.etcd.endpoints:
-    description: "endpoints are comma separated URLs that determine all distributed etcd servers. It defaults to what we have in our docker-compose file. It is by default ignored as the single_flight_type field above determines whether etcd is used or not."
+    description: "Comma separated URLs that determine all distributed etcd servers. It defaults to what we have in our docker-compose file. It is by default ignored as the single_flight_type field above determines whether etcd is used or not."
     default: "localhost:2379,localhost:22379,localhost:32379"
   single_flight.redis.endpoint:
-    description: "endpoint is the redis endpoint for a single_flight lock."
+    description: "The redis endpoint for a single_flight lock."
     default: "127.0.0.1:6379"
 
   # Storage
@@ -116,7 +126,7 @@ properties:
     description: "Bucket to use for GCP Storage."
     default: "MY_GCP_BUCKET"
   storage.gcp.json_key:
-    description: "json_key is a base64 encoded service account key that allows Athens to be run outside of GCP but still be able to access GCS. If you are running Athens inside GCP, you will most likely not need this as GCP figures out internal authentication between products for you."
+    description: "A base64 encoded service account key that allows Athens to be run outside of GCP but still be able to access GCS. If you are running Athens inside GCP, you will most likely not need this as GCP figures out internal authentication between products for you."
     default: ""
 
   storage.minio.endpoint:

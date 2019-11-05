@@ -1,0 +1,26 @@
+---
+- type: replace
+  path: /instance_groups/name=athens/jobs/name=athens/properties/tls?/cert
+  value: ((athens_server_ssl.certificate))
+
+- type: replace
+  path: /instance_groups/name=athens/jobs/name=athens/properties/tls?/key
+  value: ((athens_server_ssl.private_key))
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: athens_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: ca
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: athens_server_ssl
+    type: certificate
+    options:
+      ca: athens_ca
+      common_name: ((external_ip.value))
