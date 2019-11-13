@@ -1,4 +1,4 @@
-name: integration tests
+name: build status
 
 on: [push, pull_request]
 
@@ -13,52 +13,7 @@ jobs:
         with:
           submodules: recursive
       
-      # - name: docker
-      #   run: |
-      #     sudo mv /usr/bin/docker /usr/bin/docker.exec
-      #     cat | sudo tee /usr/bin/docker > /dev/null <<EOF
-      #     #!/bin/bash -e
-      #     mkdir -p "/home/runner/_temp/_docker_scratch"
-      #     /usr/bin/docker.exec run \
-      #       --privileged \
-      #       --name boshmainboshdocker_3ca0ab \
-      #       --label 2e4e3a \
-      #       --workdir /github/workspace \
-      #       --rm \
-      #       --tty \
-      #       -e INPUT_ENTRYPOINT \
-      #       -e INPUT_ARGS \
-      #       -e HOME \
-      #       -e GITHUB_REF \
-      #       -e GITHUB_SHA \
-      #       -e GITHUB_REPOSITORY \
-      #       -e GITHUB_ACTOR \
-      #       -e GITHUB_WORKFLOW \
-      #       -e GITHUB_HEAD_REF \
-      #       -e GITHUB_BASE_REF \
-      #       -e GITHUB_EVENT_NAME \
-      #       -e GITHUB_WORKSPACE \
-      #       -e GITHUB_ACTION \
-      #       -e GITHUB_EVENT_PATH \
-      #       -e RUNNER_OS \
-      #       -e RUNNER_TOOL_CACHE \
-      #       -e RUNNER_TEMP \
-      #       -e RUNNER_WORKSPACE \
-      #       -e ACTIONS_RUNTIME_URL \
-      #       -e ACTIONS_RUNTIME_TOKEN \
-      #       -e GITHUB_ACTIONS=true \
-      #       --entrypoint "/bin/bash" \
-      #       -v "/var/run/docker.sock":"/var/run/docker.sock" \
-      #       -v "/home/runner/work/_temp/_github_home":"/github/home" \
-      #       -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
-      #       -v "/home/runner/work/athens-bosh-release/athens-bosh-release":"/github/workspace" \
-      #       -v "/home/runner/_temp/_docker_scratch":"/scratch/docker" \
-      #       bosh/main-bosh-docker \
-      #       ./scripts/run-github-actions.sh
-      #     EOF
-      #     sudo chmod +x /usr/bin/docker
       - name: Run tests against bosh on docker
         uses: s4heid/bosh-action@master
         with:
           script: ./scripts/run-github-actions.sh
-          ops: "-o ./manifests/"
