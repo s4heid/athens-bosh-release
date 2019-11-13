@@ -4,7 +4,8 @@ variable "region" {
 }
 
 variable "env_name" {
-  type = string
+  type    = string
+  default = "athens-proxy"
 }
 
 variable "vpc_id" {
@@ -86,9 +87,9 @@ resource "aws_security_group" "athens_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port = 3000
-    to_port   = 3000
-    protocol  = "tcp"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -106,7 +107,7 @@ resource "aws_security_group" "athens_sg" {
 
 data "aws_internet_gateway" "default" {
   filter {
-    name = "attachment.vpc-id"
+    name   = "attachment.vpc-id"
     values = [var.vpc_id]
   }
 }

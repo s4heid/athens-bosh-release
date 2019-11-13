@@ -7,9 +7,9 @@ networks:
   - az: z1
     cloud_properties:
       security_groups:
-      - ((athens_security_group.value))
+      - ((athens_security_group))
       - ((default_security_group))
-      subnet: ((athens_subnet_id.value))
+      subnet: ((athens_subnet_id))
     gateway: 10.0.144.1
     range: 10.0.144.0/24
     reserved:

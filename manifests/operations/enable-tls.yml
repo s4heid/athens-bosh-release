@@ -1,26 +1,59 @@
 ---
 - type: replace
+  path: /releases/-
+  value:
+    name: "os-conf"
+    version: "21.0.0"
+    url: "https://bosh.io/d/github.com/cloudfoundry/os-conf-release?v=21.0.0"
+    sha1: "7579a96515b265c6d828924bf4f5fae115798199"
+
+- type: replace
   path: /instance_groups/name=athens/jobs/name=athens/properties/tls?/cert
-  value: ((athens_server_ssl.certificate))
+  value: ((athens_tls.certificate))
 
 - type: replace
   path: /instance_groups/name=athens/jobs/name=athens/properties/tls?/key
-  value: ((athens_server_ssl.private_key))
+  value: ((athens_tls.private_key))
+
+- type: replace
+  path: /instance_groups/name=athens-test-errand/jobs/-
+  value:
+    release: os-conf
+    name: ca_certs
+    properties:
+      certs: ((athens_tls.ca))
 
 - type: replace
   path: /variables?/-
   value:
-    name: athens_ca
+    name: ca
     type: certificate
     options:
       is_ca: true
-      common_name: ca
+      common_name: athens-ca
 
 - type: replace
   path: /variables?/-
   value:
-    name: athens_server_ssl
+    name: athens_tls
     type: certificate
     options:
-      ca: athens_ca
-      common_name: ((external_ip.value))
+      ca: ca
+      common_name: athens
+      alternative_names:
+      - ((external_ip))
+      extended_key_usage:
+      - server_auth
+    consumes:
+      alternative_name:
+        from: athens-address
+
+- type: replace
+  path: /instance_groups/name=athens/jobs/name=athens/provides?/athens/as
+  value: athens
+
+- type: replace
+  path: /instance_groups/name=athens/jobs/name=athens/custom_provider_definitions?/-
+  value:
+    name: athens-address
+    type: address

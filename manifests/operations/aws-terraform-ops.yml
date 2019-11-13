@@ -3,7 +3,7 @@
   path: /instance_groups/name=athens/networks/-
   value:
     name: vip
-    static_ips: [((external_ip.value))]
+    static_ips: [((external_ip))]
 
 - type: replace
   path: /instance_groups/name=athens/vm_type
