@@ -2,7 +2,9 @@
 
 set -eu
 
-/usr/local/bin/start-bosh -o $PWD/manifests/operations/enable-dns.yml
+/usr/local/bin/start-bosh \
+    -o /usr/local/bosh-deployment/credhub.yml \
+    -o $PWD/manifests/operations/enable-dns.yml
 
 source /tmp/local-bosh/director/env
 
@@ -16,14 +18,13 @@ bosh upload-stemcell \
 export BOSH_DEPLOYMENT=athens
 export BOSH_NON_INTERACTIVE=true
 
-bosh update-runtime-config --name=dns \
-    <(bosh int /usr/local/bosh-deployment/runtime-configs/dns.yml --vars-store=/tmp/deployment-vars.yml)
+bosh update-runtime-config --name=dns /usr/local/bosh-deployment/runtime-configs/dns.yml
 
 bosh deploy \
     --ops-file=./manifests/operations/dev-ops.yml \
+    --ops-file=./manifests/operations/enable-tls.yml \
     --var=repo_dir="$PWD" \
     --var=os="${stemcell_os}" \
-    --vars-store=/tmp/deployment-vars.yml \
     ./manifests/athens.yml
 
 set +e
