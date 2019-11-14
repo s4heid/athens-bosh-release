@@ -2,13 +2,12 @@
 
 set -euo pipefail
 
-info () { printf "\n\033[00;34m[$(date +"%r")] $1\033[0m\n"; }
-
 export BOSH_DEPLOYMENT=athens
 export BOSH_NON_INTERACTIVE=true
 export BOSH_BINARY_PATH=${BOSH_BINARY_PATH:-/usr/local/bin/bosh}
 
 root_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+source "$root_dir"/scripts/utils.sh
 
 stemcell_name="${STEMCELL_NAME:-bosh-warden-boshlite-ubuntu-xenial-go_agent}"
 stemcell_version="${STEMCELL_VERSION:-456.30}"
@@ -27,7 +26,8 @@ bosh upload-stemcell "https://bosh.io/d/stemcells/${stemcell_name}?v=${stemcell_
     --version $stemcell_version
 
 ops_files=()
-if [ "$BBL_IAAS" = "aws" ]; then
+
+if [[ $stemcell_name == *"aws"* ]]; then
     info "Uploading cloud config"
 
     bosh update-config \

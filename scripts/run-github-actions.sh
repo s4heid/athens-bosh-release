@@ -6,7 +6,6 @@ set -eu
 
 source /tmp/local-bosh/director/env
 
-
 bosh upload-stemcell \
     --name=bosh-warden-boshlite-ubuntu-xenial-go_agent \
     --version=621.5 \
