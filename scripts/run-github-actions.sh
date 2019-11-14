@@ -2,6 +2,7 @@
 
 set -eu
 
+# credhub is required to generate the certs when tls is enabled
 /usr/local/bin/start-bosh \
     -o $PWD/manifests/operations/enable-dns.yml \
     -o /usr/local/bosh-deployment/uaa.yml \
@@ -27,6 +28,7 @@ bosh deploy \
     --ops-file=./manifests/operations/enable-tls.yml \
     --var=repo_dir="$PWD" \
     --var=os="${stemcell_os}" \
+    --vars-store=/tmp/deployment-vars.yml \
     ./manifests/athens.yml
 
 set +e
