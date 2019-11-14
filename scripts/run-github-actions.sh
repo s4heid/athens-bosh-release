@@ -3,9 +3,10 @@
 set -eu
 
 /usr/local/bin/start-bosh \
-    -o /usr/local/bosh-deployment/credhub.yml \
+    -o $PWD/manifests/operations/enable-dns.yml \
     -o /usr/local/bosh-deployment/uaa.yml \
-    -o $PWD/manifests/operations/enable-dns.yml
+    -o /usr/local/bosh-deployment/credhub.yml \
+    --vars-store=/tmp/deployment-vars.yml
 
 source /tmp/local-bosh/director/env
 
