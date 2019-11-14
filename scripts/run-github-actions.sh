@@ -27,6 +27,7 @@ bosh deploy \
     --ops-file=./manifests/operations/enable-tls.yml \
     --var=repo_dir="$PWD" \
     --var=os="${stemcell_os}" \
+    --var=external_ip="10.245.0.3" \
     --vars-store=/tmp/deployment-vars.yml \
     ./manifests/athens.yml
 
