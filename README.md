@@ -5,6 +5,45 @@
 This BOSH release provides jobs for running the [Athens](https://docs.gomods.io) project in a BOSH environment.
 
 
+## Architecture
+
+![Athens Architecture](./docs/athens.png)
+
+
+## Usage
+
+Upload the bosh release to your director from the command line with the `upload-releases` command:
+
+```sh
+$ bosh upload-release --name=athens --version=0.0.1 \
+    git+https://github.com/s4heid/athens-bosh-release
+```
+
+Or reference it in the `releases` section of your deployment manifest:
+
+```yaml
+releases:
+- name: athens
+  version: 0.0.1
+  url: git+https://github.com/s4heid/athens-bosh-release
+```
+
+Add the athens job to an instance group in the deployment manifest, e.g.
+
+```yaml
+instance_groups:
+- name: athens
+  persistent_disk: 1024
+  jobs:
+  - name: athens
+    release: athens
+    properties:
+      storage_type: disk
+```
+
+The above example configures the persistent disk as storage provider.
+
+
 ## Getting Started
 
 The following section explains how to set up different environments for deploying the athens-bosh-release and running the integration tests.
