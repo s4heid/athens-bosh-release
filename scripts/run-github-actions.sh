@@ -6,8 +6,7 @@ set -eu
 /usr/local/bin/start-bosh \
     -o $PWD/manifests/operations/enable-dns.yml \
     -o /usr/local/bosh-deployment/uaa.yml \
-    -o /usr/local/bosh-deployment/credhub.yml \
-    --vars-store=/tmp/deployment-vars.yml
+    -o /usr/local/bosh-deployment/credhub.yml
 
 source /tmp/local-bosh/director/env
 
