@@ -60,7 +60,7 @@ if [ ! -f "$ROOT_DIR"/.envrc ]; then
 
 # bbl environment (https://github.com/cloudfoundry/bosh-bootloader)
 export BBL_STATE_DIR=~/workspace/bosh-openstack-cpi-shared/aws
-eval "$(bbl --state-dir "${BBL_STATE_DIR}" print-env)"
+eval "\$(bbl --state-dir "\${BBL_STATE_DIR}" print-env)"
 
 # bosh stemcell (https://bosh.io/stemcells)
 export STEMCELL_NAME=bosh-aws-xen-hvm-ubuntu-xenial-go_agent
