@@ -17,7 +17,7 @@ stemcell_os="${STEMCELL_OS:-ubuntu-xenial}"
 pushd "${root_dir}" > /dev/null
 
 info "Deleting old deployment"
-# bosh delete-deployment --force
+bosh delete-deployment --force
 
 info "Uploading stemcell"
 bosh upload-stemcell "https://bosh.io/d/stemcells/${stemcell_name}?v=${stemcell_version}" \
@@ -25,8 +25,8 @@ bosh upload-stemcell "https://bosh.io/d/stemcells/${stemcell_name}?v=${stemcell_
     --sha1 $stemcell_sha1 \
     --version $stemcell_version
 
-ops_files=()
-
+deploy_files=()
+deploy_vars=$(mktemp /tmp/aws-vars.XXXXXX); trap 'echo "Deleting $deploy_vars" 1>&2; rm -f $deploy_vars' 0 2 3 15
 if [[ $stemcell_name == *"aws"* ]]; then
     info "Uploading cloud config"
 
@@ -37,26 +37,31 @@ if [[ $stemcell_name == *"aws"* ]]; then
         --var=default_security_group="$( bosh cloud-config | bosh int --path=/networks/name=default/subnets/0/cloud_properties/security_groups/0 - )" \
         ./manifests/cloud-config.yml
 
-    ops_files+=( "--ops-file=./manifests/operations/aws-terraform-ops.yml" )
+    deploy_files+=( "--ops-file=./manifests/operations/aws-terraform-ops.yml" )
+    terraform output -state=ci/terraform/terraform.tfstate -json \
+        | jq 'to_entries | map({key, "value": .value.value}) | from_entries' \
+        > $deploy_vars
+else
+    # bosh lite
+    echo "{\"external_ip\": \"10.244.0.2\"}" > $deploy_vars
 fi
-
-ops_files+=( "--ops-file=./manifests/operations/enable-tls.yml" )
 
 info "Deploying $BOSH_DEPLOYMENT"
 bosh deploy \
     --ops-file=./manifests/operations/dev-ops.yml \
+    --ops-file=./manifests/operations/enable-tls.yml \
     --var=repo_dir="$PWD" \
-    --var=os="${stemcell_os}" \
-    --vars-file=<(terraform output -state=ci/terraform/terraform.tfstate -json | jq 'to_entries | map({key, "value": .value.value}) | from_entries') \
-    "${ops_files[@]}" \
+    --var=os=$stemcell_os \
+    --vars-file=<(cat $deploy_vars) \
+    "${deploy_files[@]}" \
     ./manifests/athens.yml
 
 info "Running tests with an errand"
 bosh run-errand --keep-alive athens-test-errand
 
 info "Cleaning up"
-# bosh delete-deployment
-# bosh clean-up --all
+bosh delete-deployment
+bosh clean-up --all
 
 popd > /dev/null
 
