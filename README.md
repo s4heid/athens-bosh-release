@@ -9,6 +9,10 @@ This BOSH release provides jobs for running the [Athens](https://docs.gomods.io)
 
 The following section explains how to set up different environments for deploying the athens-bosh-release and running the integration tests.
 
+### bosh-lite
+
+If you only want to run the tests against a local athens VM, the easiest way to get started is probably bosh-lite. Step by step instructions on how to spin up a bosh-lite environment are given in the [bosh docs](https://bosh.io/docs/bosh-lite).
+
 ### bosh-bootloader (aws)
 
 Deploying a bosh with [bosh-bootloader](https://github.com/cloudfoundry/bosh-bootloader) (bbl) is another possibility to get started. Assuming you have already installed a bosh on AWS as described in [this guide](https://github.com/cloudfoundry/bosh-bootloader/blob/master/docs/getting-started-aws.md), you need to set up a few additional things in the infrastructure. This can be achieved by running
@@ -24,10 +28,6 @@ $ AWS_ACCESS_KEY_ID="..." AWS_SECRET_ACCESS_KEY="..." ./scripts/tf-apply.sh
 ```
 
 The script will prompt you to log in to your lastpass account, as it will sync the terraform state with a lastpass secret note.
-
-### bosh-lite
-
-If it is sufficient to run the athens server locally (e.g., for testing or development purposes) you might want to use bosh-lite. This is probably the easiest way to spin up a bosh environment and is explained step by step in the [bosh docs](https://bosh.io/docs/bosh-lite).
 
 
 ## Development
