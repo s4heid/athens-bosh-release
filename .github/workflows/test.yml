@@ -1,4 +1,4 @@
-name: build status
+name: Build Status
 
 on: [push, pull_request]
 
@@ -6,13 +6,11 @@ jobs:
   test:
     name: Athens Integration Tests
     runs-on: ubuntu-18.04
-
     steps:
       - name: Checkout
         uses: actions/checkout@v1
         with:
           submodules: recursive
-      
       - name: Run tests against bosh on docker
         uses: s4heid/bosh-action@master
         with:

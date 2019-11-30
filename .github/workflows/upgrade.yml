@@ -20,10 +20,10 @@ jobs:
         uses: s4heid/bosh-blobs-upgrader@dev
         with:
           repository: .
-      # - name: Run tests against bosh on docker
-      #   uses: s4heid/bosh-action@master
-      #   with:
-      #     script: ./ci/actions/test.sh
+      - name: Run tests against bosh on docker
+        uses: s4heid/bosh-action@master
+        with:
+          script: ./ci/actions/test.sh
       # - name: Create final release, push and tag the commit
       # - name: Bump version and push tag
       #   uses: anothrNick/github-tag-action@master
