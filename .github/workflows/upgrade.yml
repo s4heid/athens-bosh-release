@@ -17,7 +17,7 @@ jobs:
         with:
           submodules: recursive
       - name: Upgrade Bosh Blobs
-        uses: s4heid/bosh-blobs-upgrader@master
+        uses: s4heid/bosh-blobs-upgrader@dev
         with:
           repository: .
       # - name: Run tests against bosh on docker
