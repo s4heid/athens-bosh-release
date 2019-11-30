@@ -9,24 +9,36 @@ on:
 
 jobs:
   upgrade:
-    name: Upgrade Bosh blobs
+    name: Upgrade bosh blobs
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v1
         with:
           submodules: recursive
-      - name: Upgrade Bosh Blobs
-        uses: s4heid/bosh-blobs-upgrader@dev
+      - name: Upgrade bosh blobs
+        uses: s4heid/bosh-blobs-upgrader-action@master
         with:
           repository: .
       - name: Run tests against bosh on docker
         uses: s4heid/bosh-action@master
         with:
           script: ./ci/actions/test.sh
-      # - name: Create final release, push and tag the commit
-      # - name: Bump version and push tag
-      #   uses: anothrNick/github-tag-action@master
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     WITH_V: true
+      - name: Upload blobs and create final release
+        if: success()
+        run: |
+          test -f config/blobs.yml
+
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add -A && \
+            git diff-index --cached --quiet HEAD -- config/blobs.yml || \
+            git commit -m 'Updating blobs'
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: blobs
+
