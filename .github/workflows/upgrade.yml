@@ -16,29 +16,59 @@ jobs:
         uses: actions/checkout@v1
         with:
           submodules: recursive
-      - name: Upgrade bosh blobs
+      - name: Get Git Version
+        run: |
+          t="$(git describe --tags `git rev-list --tags --max-count=1`)" || true
+          commit=$(git rev-parse HEAD)
+          if [ -z "$t" ]
+          then
+              log=$(git log --pretty=oneline)
+              t=0.0.0
+          else
+              log=$(git log $t..HEAD --pretty=oneline)
+          fi
+          level="minor"
+          case "$log" in
+              *#major* ) level="major";;
+              *#patch* ) level="patch";;
+          esac
+          new_version="$(docker run --rm alpine/semver semver -c -i "$level" "$t")"
+          echo $new_version > /home/runner/work/version.txt
+      - name: Uprade bosh blobs
         uses: s4heid/bosh-blobs-upgrader-action@master
         with:
           repository: .
-      - name: Run tests against bosh on docker
-        uses: s4heid/bosh-action@master
-        with:
-          script: ./ci/actions/test.sh
+      # - name: Run tests against bosh on docker
+      #   uses: s4heid/bosh-action@master
+      #   with:
+      #     script: ./ci/actions/test.sh
       - name: Upload blobs and create final release
-        if: success()
         run: |
-          test -f config/blobs.yml
-
+          set -ex
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git add -A ; git status
+          if git diff-index --cached --quiet HEAD -- config/blobs.yml ; then
+             >&2 echo "no changes in config/blobs.yml" ; exit 1
+          fi
+          # bosh upload-blobs
+          git commit -m 'Updating blobs'
 
-          git add -A && \
-            git diff-index --cached --quiet HEAD -- config/blobs.yml || \
-            git commit -m 'Updating blobs'
+          bosh create-release --tarball=/tmp/athens-release.tgz --timestamp-version --force
 
+          new_version="$(cat /home/runner/work/version.txt)"
+          if [ -n "new_version" ]; then
+            bosh finalize-release --version "$new_version" /tmp/athens-release.tgz
+            git add -A ; git commit -m "Final release $new_version"
+            git tag -s $new_version
+          fi
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: blobs
-
+          branch: HEAD:refs/heads/blobs
+          force: true
+      # - name: Bump version and push tag
+      #   uses: anothrNick/github-tag-action@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

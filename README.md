@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/s4heid/athens-bosh-release/workflows/build%20status/badge.svg)](https://github.com/s4heid/athens-bosh-release/actions)
+[![Actions Status](https://github.com/s4heid/athens-bosh-release/workflows/Build%20Status/badge.svg)](https://github.com/s4heid/athens-bosh-release/actions)
 
 # athens-bosh-release
 
