@@ -49,6 +49,8 @@ jobs:
         run: |
           set -ex
 
+          pwd
+
           bosh_cli_version=6.1.1
           mkdir -p /home/runner/work/_temp/bin
           wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 --output-document="/home/runner/work/_temp/bin/bosh" && \
@@ -70,6 +72,8 @@ jobs:
               secret_access_key: $AWS_SECRET_ACCESS_KEY
           EOF
           )
+
+          ls -al /home/runner/work/athens-bosh-release/athens-bosh-release/blobs/git/git-2.24.0.tar.gz
 
           /home/runner/work/_temp/bin/bosh blobs
           /home/runner/work/_temp/bin/bosh upload-blobs
