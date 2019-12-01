@@ -45,20 +45,26 @@ jobs:
       - name: Upload blobs and create final release
         run: |
           set -ex
+
+          bosh_cli_version=6.1.1
+          mkdir -p /home/runner/work/_temp/bin
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 --output-document="/home/runner/work/_temp/bin/bosh" && \
+            chmod +x /home/runner/work/_temp/bin/bosh
+
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A ; git status
           if git diff-index --cached --quiet HEAD -- config/blobs.yml ; then
              >&2 echo "no changes in config/blobs.yml" ; exit 1
           fi
-          # bosh upload-blobs
+          # /home/runner/work/_temp/bin/bosh upload-blobs
           git commit -m 'Updating blobs'
 
-          bosh create-release --tarball=/tmp/athens-release.tgz --timestamp-version --force
+          /home/runner/work/_temp/bin/bosh create-release --tarball=athens-release.tgz --timestamp-version --force
 
           new_version="$(cat /home/runner/work/version.txt)"
           if [ -n "new_version" ]; then
-            bosh finalize-release --version "$new_version" /tmp/athens-release.tgz
+            /home/runner/work/_temp/bin/bosh finalize-release --version "$new_version" athens-release.tgz
             git add -A ; git commit -m "Final release $new_version"
             git tag -s $new_version
           fi
