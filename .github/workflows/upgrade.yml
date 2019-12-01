@@ -43,6 +43,9 @@ jobs:
       #   with:
       #     script: ./ci/actions/test.sh
       - name: Upload blobs and create final release
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           set -ex
 
@@ -55,18 +58,28 @@ jobs:
           git config --local user.name "GitHub Action"
           git add -A ; git status
           if git diff-index --cached --quiet HEAD -- config/blobs.yml ; then
-             >&2 echo "no changes in config/blobs.yml" ; exit 1
+             echo "no changes in config/blobs.yml" ; exit 0
           fi
-          # /home/runner/work/_temp/bin/bosh upload-blobs
-          git commit -m 'Updating blobs'
 
-          /home/runner/work/_temp/bin/bosh create-release --tarball=athens-release.tgz --timestamp-version --force
+          ( set +x ; cat > ./config/private.yml <<EOF
+          ---
+          blobstore:
+            provider: s3
+            options:
+              access_key_id: $AWS_ACCESS_KEY_ID
+              secret_access_key: $AWS_SECRET_ACCESS_KEY
+          EOF
+          )
+
+          /home/runner/work/_temp/bin/bosh blobs
+          /home/runner/work/_temp/bin/bosh upload-blobs
+          git commit -m 'Updating blobs'
 
           new_version="$(cat /home/runner/work/version.txt)"
           if [ -n "new_version" ]; then
-            /home/runner/work/_temp/bin/bosh finalize-release --version "$new_version" athens-release.tgz
+            BOSH_LOG_LEVEL=debug /home/runner/work/_temp/bin/bosh create-release --version="$new_version" --tarball=./athens-release.tgz
             git add -A ; git commit -m "Final release $new_version"
-            git tag -s $new_version
+            git tag -s v$new_version
           fi
       - name: Push changes
         uses: ad-m/github-push-action@master
@@ -74,7 +87,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: HEAD:refs/heads/blobs
           force: true
-      # - name: Bump version and push tag
-      #   uses: anothrNick/github-tag-action@master
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

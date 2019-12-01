@@ -46,12 +46,11 @@ pushd "$STATE_DIR" > /dev/null
 popd > /dev/null
 
 cat > "$ROOT_DIR"/config/private.yml <<EOF
-private_yml: |
-  blobstore:
-    provider: s3
-    options:
-      access_key_id: $( jq -r '.athens_access_key' <<< $out )
-      secret_access_key: $( jq -r '.athens_secret_key' <<< $out )
+blobstore:
+  provider: s3
+  options:
+    access_key_id: $( jq -r '.athens_access_key' <<< $out )
+    secret_access_key: $( jq -r '.athens_secret_key' <<< $out )
 EOF
 
 if [ ! -f "$ROOT_DIR"/.envrc ]; then
