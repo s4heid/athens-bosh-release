@@ -1,4 +1,5 @@
 source:
+  name: git
   version_check: |
     curl -s https://mirrors.edge.kernel.org/pub/software/scm/git/ | grep -oE "([0-9]{1,}\.)+([0-9]{1,})" | sort -Vr | uniq
   metalink_get: |
