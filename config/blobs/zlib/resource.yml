@@ -1,0 +1,10 @@
+name: zlib
+source:
+  version_check: |
+    curl -s -l https://www.zlib.net/fossils/ | grep -Eo '\"zlib-(\d+\.)?(\d+\.)?(\d+\.)?(\d+\.)tar.gz\"' | sed -E 's/^\"zlib-(.+)\.tar.gz\"$/\1/'
+  metalink_get: |
+    jq -n '
+      env.version | {
+        "files": [
+          { "name": "zlib-\(.).tar.gz",
+            "urls": [ { "url": "https://www.zlib.net/zlib-\(.).tar.gz" } ] } ] }'
