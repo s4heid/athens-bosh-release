@@ -1,0 +1,10 @@
+source:
+  version_check: |
+    curl -s -l https://ftp.gnu.org/gnu/autoconf/ | grep -Eo '\"autoconf-(\d+\.)?(\d+\.)tar.gz\"' | sed -E 's/^\"autoconf-(.+)\.tar.gz\"$/\1/'
+  metalink_get: |
+    jq -n '
+      "autoconf-\(env.version).tar.gz" | {
+        "files": [
+          { "name": .,
+            "version": env.version,
+            "urls": [ { "url": "https://ftp.gnu.org/gnu/autoconf/\(.)" } ] } ] }'
