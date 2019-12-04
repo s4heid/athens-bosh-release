@@ -34,36 +34,12 @@ jobs:
           esac
           new_version="$(docker run --rm alpine/semver semver -c -i "$level" "$t")"
           echo $new_version > /home/runner/work/version.txt
-      - name: Uprade bosh blobs
-        uses: s4heid/bosh-blobs-upgrader-action@master
-        with:
-          repository: .
-      # - name: Run tests against bosh on docker
-      #   uses: s4heid/bosh-action@master
-      #   with:
-      #     script: ./ci/actions/test.sh
-      - name: Upload blobs and create final release
+      - name: Create private.yml
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          set -ex
-
-          pwd
-
-          bosh_cli_version=6.1.1
-          mkdir -p /home/runner/work/_temp/bin
-          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 --output-document="/home/runner/work/_temp/bin/bosh" && \
-            chmod +x /home/runner/work/_temp/bin/bosh
-
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add -A ; git status
-          if git diff-index --cached --quiet HEAD -- config/blobs.yml ; then
-             echo "no changes in config/blobs.yml" ; exit 0
-          fi
-
-          ( set +x ; cat > ./config/private.yml <<EOF
+          set +x ; cat > ./config/private.yml <<EOF
           ---
           blobstore:
             provider: s3
@@ -71,13 +47,31 @@ jobs:
               access_key_id: $AWS_ACCESS_KEY_ID
               secret_access_key: $AWS_SECRET_ACCESS_KEY
           EOF
-          )
+      - name: Uprade bosh blobs
+        uses: s4heid/bosh-blobs-upgrader-action@master
+        env:
+          GIT_NAME: "GitHub Action"
+          GIT_EMAIL: "action@github.com"
+        with:
+          repository: .
+      - name: Run tests against bosh on docker
+        uses: s4heid/bosh-action@master
+        with:
+          script: ./ci/actions/test.sh
+      - name: Upload blobs and create final release
+        run: |
+          set -ex
 
-          ls -al /home/runner/work/athens-bosh-release/athens-bosh-release/blobs/git/git-2.24.0.tar.gz
+          bosh_cli_version=6.1.1
+          mkdir -p /home/runner/work/_temp/bin
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 --output-document="/home/runner/work/_temp/bin/bosh" && \
+            chmod +x /home/runner/work/_temp/bin/bosh
 
-          /home/runner/work/_temp/bin/bosh blobs
-          /home/runner/work/_temp/bin/bosh upload-blobs
-          git commit -m 'Updating blobs'
+          commits=$(git log --oneline origin/master..HEAD | wc -l)
+          if [[ "$commits" == "0" ]]; then
+            echo "No blobs upgrade required"
+            exit 0
+          fi
 
           new_version="$(cat /home/runner/work/version.txt)"
           if [ -n "new_version" ]; then
@@ -91,3 +85,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: HEAD:refs/heads/blobs
           force: true
+      # - name: Create pull request
