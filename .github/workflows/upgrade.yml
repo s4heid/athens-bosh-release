@@ -5,7 +5,7 @@ on:
     - cron: '* 23 * * *'
   push:
     branches:
-    - upgrader
+    - master
 
 jobs:
   upgrade:
@@ -34,6 +34,7 @@ jobs:
           esac
           new_version="$(docker run --rm alpine/semver semver -c -i "$level" "$t")"
           echo $new_version > /home/runner/work/version.txt
+          echo "::set-env name=TAG_VERSION::$new_version"
       - name: Upload next semver version
         uses: actions/upload-artifact@v1
         with:
@@ -59,13 +60,19 @@ jobs:
           GIT_EMAIL: "action@github.com"
           GIT_UPDATE_BRANCH: blobs
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGELOG_VERSION: ${{ env.TAG_VERSION }}
         with:
           repository: .
+      - name: Upload changelog
+        uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: config/changelog/CHANGELOG_*.txt
       - name: Cleanup private.yml
         if: always()
         shell: bash
         run: |
-          rm ./config/private.yml
+          rm -f ./config/private.yml
       - name: Run tests against bosh on docker
         uses: s4heid/bosh-action@master
         with:
