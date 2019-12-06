@@ -39,11 +39,6 @@ jobs:
           CHANGELOG_VERSION: ${{ env.TAG_VERSION }}
         with:
           repository: .
-      - name: Upload changelog
-        uses: actions/upload-artifact@v1
-        with:
-          name: version
-          path: config/changelog/CHANGELOG_*.txt
       - name: Cleanup private.yml
         if: always()
         shell: bash
