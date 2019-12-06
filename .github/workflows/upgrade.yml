@@ -1,0 +1,147 @@
+name: Blobs Upgrader
+
+on:
+  schedule:
+    - cron: '* 23 * * *'
+  push:
+    branches:
+    - master
+
+jobs:
+  upgrade:
+    name: Upgrade bosh blobs
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+        with:
+          ref: blobs
+      - name: Get Git Version
+        run: |
+          t="$(git describe --tags `git rev-list --tags --max-count=1`)" || true
+          commit=$(git rev-parse HEAD)
+          if [ -z "$t" ]
+          then
+              log=$(git log --pretty=oneline)
+              t=0.0.0
+          else
+              log=$(git log $t..HEAD --pretty=oneline)
+          fi
+          level="minor"
+          case "$log" in
+              *#major* ) level="major";;
+              *#patch* ) level="patch";;
+          esac
+          new_version="$(docker run --rm alpine/semver semver -c -i "$level" "$t")"
+          echo $new_version > /home/runner/work/version.txt
+          echo "::set-env name=TAG_VERSION::$new_version"
+      - name: Upload next semver version
+        uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: /home/runner/work/version.txt
+      - name: Create private.yml
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set +x ; cat > ./config/private.yml <<EOF
+          ---
+          blobstore:
+            provider: s3
+            options:
+              access_key_id: $AWS_ACCESS_KEY_ID
+              secret_access_key: $AWS_SECRET_ACCESS_KEY
+          EOF
+      - name: Upgrade bosh blobs
+        uses: s4heid/bosh-blobs-upgrader-action@master
+        env:
+          GIT_NAME: "GitHub Action"
+          GIT_EMAIL: "action@github.com"
+          GIT_UPDATE_BRANCH: blobs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGELOG_VERSION: ${{ env.TAG_VERSION }}
+        with:
+          repository: .
+      - name: Upload changelog
+        uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: config/changelog/CHANGELOG_*.txt
+      - name: Cleanup private.yml
+        if: always()
+        shell: bash
+        run: |
+          rm -f ./config/private.yml
+      - name: Run tests against bosh on docker
+        uses: s4heid/bosh-action@master
+        with:
+          script: ./ci/actions/test.sh
+  release:
+    name: Create final release
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Download next semver version
+        uses: actions/download-artifact@v1
+        with:
+          name: version
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+        with:
+          ref: blobs
+      - name: Upload blobs and create final release
+        shell: bash
+        run: |
+          set -euxo
+
+          commits=$(git log --oneline origin/master..origin/blobs | wc -l)
+          if [[ "$commits" == "0" ]]; then
+            echo "No blobs upgrade required"
+            exit 0
+          fi
+
+          new_version="$(cat version/version.txt)"
+          if [ -n "new_version" ]; then
+            echo "No new version detected."
+            exit 0
+          fi
+
+          bosh_cli_version=6.1.1
+          mkdir -p /home/runner/work/_temp/bin
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 --output-document="/home/runner/work/_temp/bin/bosh" && \
+            chmod +x /home/runner/work/_temp/bin/bosh
+          
+          BOSH_LOG_LEVEL=debug /home/runner/work/_temp/bin/bosh create-release --version="$new_version" --tarball=/home/runner/work/athens-"${new_version}".tgz
+
+          if ! git diff --no-ext-diff --quiet --exit-code; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add -A ; git commit -m "Final release $new_version"
+          fi
+
+          ( set +x ;
+            curl -s -X POST https://api.github.com/repos/${GITHUB_ACTOR}/${GITHUB_REPOSITORY}/git/refs \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -d @- << EOF
+          {
+            "ref": "refs/tags/v$new_version",
+            "sha": "$commit"
+          }
+            EOF
+          )
+          remote_repo="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push "${remote_repo}" HEAD:blobs --follow-tags
+      - name: Upload final bosh release
+        uses: actions/upload-artifact@v1
+        if: hashFiles('athens-*.tgz') != ''
+        with:
+          name: final-release
+          path: /home/runner/work/athens-"$(cat version/version.txt)".tgz
+      - name: Pull Request
+        uses: repo-sync/pull-request@v2
+        if: success()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "Updating dependencies"
+          pr_body: ":robot: This is an automated pull request."
+          pr_label: "auto-update"

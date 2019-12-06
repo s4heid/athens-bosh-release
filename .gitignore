@@ -1,6 +1,6 @@
 ### BOSH ###
 config/private.yml
-blobs
+/blobs
 dev_releases
 releases/*.tgz
 releases/**/*.tgz
@@ -23,4 +23,6 @@ crash.log
 
 ### Others ###
 *.tgz
+*.txt
+*.tar.gz
 .envrc
