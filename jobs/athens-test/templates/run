@@ -2,7 +2,7 @@
 
 set -eu
 
-source /var/vcap/packages/golang-1.12-linux/bosh/runtime.env
+source /var/vcap/packages/golang-1.13-linux/bosh/runtime.env
 
 <% athens = link('athens') %>
 export GOPROXY="http<%= athens.p('tls.cert') != '' ? 's' : '' %>://<%= athens.address %><%= athens.p('port') %>"

@@ -1,9 +1,9 @@
 #!/bin/bash -eu
 
-source /var/vcap/packages/golang-1.12-linux/bosh/runtime.env
+source /var/vcap/packages/golang-1.13-linux/bosh/runtime.env
 
 export PATH=/var/vcap/packages/git/bin:$PATH
-export GO_BINARY_PATH=/var/vcap/packages/golang-1.12-linux/bin/go
+export GO_BINARY_PATH=/var/vcap/packages/golang-1.13-linux/bin/go
 
 if [ "<%= p('storage_type') %>" = "disk" ]; then
   export ATHENS_DISK_STORAGE_ROOT=/var/vcap/store/athens

@@ -9,4 +9,4 @@ consumes:
   type: athens
 
 packages:
-- golang-1.12-linux
+- golang-1.13-linux

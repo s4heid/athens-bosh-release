@@ -2,7 +2,7 @@
 
 set -eux
 
-source /var/vcap/packages/golang-1.12-linux/bosh/compile.env
+source /var/vcap/packages/golang-1.13-linux/bosh/compile.env
 
 version="unset"
 built="$( date -u +%Y-%m-%dT%H:%M:%S+00:00 )"

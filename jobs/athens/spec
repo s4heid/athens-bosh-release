@@ -18,7 +18,7 @@ provides:
 packages:
 - athens
 - git
-- golang-1.12-linux
+- golang-1.13-linux
 
 properties:
   go_env:
