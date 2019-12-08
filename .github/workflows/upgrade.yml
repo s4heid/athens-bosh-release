@@ -2,7 +2,7 @@ name: Blobs Upgrader
 
 on:
   schedule:
-    - cron: '* 23 * * *'
+    - cron: '20 0 * * *'
   push:
     branches:
     - master
@@ -36,7 +36,6 @@ jobs:
           GIT_EMAIL: "action@github.com"
           GIT_UPDATE_BRANCH: blobs
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHANGELOG_VERSION: ${{ env.TAG_VERSION }}
         with:
           repository: .
       - name: Cleanup private.yml
@@ -48,9 +47,13 @@ jobs:
         uses: s4heid/bosh-action@master
         with:
           script: ./ci/actions/test.sh
-      - name: Push changes
-        uses: ad-m/github-push-action@master
+      - name: Pull Request
+        uses: repo-sync/pull-request@v2
+        if: success()
         with:
+          source_branch: blobs
+          destination_branch: master
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: blobs
-          force: true
+          pr_title: "Updating dependencies"
+          pr_body: ":robot: This is an automated pull request."
+          pr_label: "auto-update"
