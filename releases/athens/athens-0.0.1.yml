@@ -1,0 +1,40 @@
+name: athens
+version: 0.0.1
+commit_hash: fd03b26
+uncommitted_changes: false
+jobs:
+- name: athens
+  version: 6ec3ad6feb92ed52012b7eac92a5b67e1f8074f1800d57438a80fccab4322eb9
+  fingerprint: 6ec3ad6feb92ed52012b7eac92a5b67e1f8074f1800d57438a80fccab4322eb9
+  sha1: sha256:90fc228f805c694be1e589344d4b520cc8ab32633bc3e0b5502727c19a5b88c4
+  packages:
+  - athens
+  - git
+  - golang-1.13-linux
+- name: athens-test
+  version: 1467655f4911b51652ecda4958d3e426524c2c70ae6c82cc2a07ceae795c91e4
+  fingerprint: 1467655f4911b51652ecda4958d3e426524c2c70ae6c82cc2a07ceae795c91e4
+  sha1: sha256:5e8d118ca243d452c78942a268252b779a65ca1f3bac333b89fb6f0c14098c0f
+  packages:
+  - golang-1.13-linux
+packages:
+- name: athens
+  version: 813491572fbd4d70b39c5593af78620aad1b90dbc0e8b2d63102e79794b24060
+  fingerprint: 813491572fbd4d70b39c5593af78620aad1b90dbc0e8b2d63102e79794b24060
+  sha1: sha256:b47f8d3a08d3ca82d9be18cd299e40666ea29e028b8e8f308563fd98b3505466
+  dependencies:
+  - golang-1.13-linux
+- name: git
+  version: b1f0d3d35c9e47e5fd766aa21d34dc42408b8e11b8c95e2c30fe7682fb013a18
+  fingerprint: b1f0d3d35c9e47e5fd766aa21d34dc42408b8e11b8c95e2c30fe7682fb013a18
+  sha1: sha256:095ad44ce14ae24d27d3da2841ccd661b2d91e71bfd859277bcb023d8e352553
+  dependencies: []
+- name: golang-1.13-linux
+  version: b6590a82af5f75919501780bf4270922cd9f1e77ad3b21fbcadc2b5b4662482a
+  fingerprint: b6590a82af5f75919501780bf4270922cd9f1e77ad3b21fbcadc2b5b4662482a
+  sha1: sha256:b6a1774456c03549c1f90691cee765fa0e61777e3eff9ba9fc52e0acf7e78bd3
+  dependencies: []
+license:
+  version: 1ebdbf60b9523654cd77525ed4551b5f93bbb8a8436c6029b0ebea1216e75598
+  fingerprint: 1ebdbf60b9523654cd77525ed4551b5f93bbb8a8436c6029b0ebea1216e75598
+  sha1: sha256:10406dc607dec10fc729f9fcad114e55818f1e2d07f263f65f6f469765b49aca
