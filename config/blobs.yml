@@ -2,10 +2,10 @@ autoconf/autoconf-2.69.tar.gz:
   size: 1927468
   object_id: acf6f4a7-f4a4-430b-4483-1b92acad7d11
   sha: sha256:954bd69b391edc12d6a4a51a2dd1476543da5c6bbf05a95b59dc0dd6fd4c2969
-git/git-2.9.5.tar.gz:
-  size: 5928730
-  object_id: 4ce2a257-ab95-407f-6468-8dcabf273cf4
-  sha: sha256:8fa575338137d6d850b52d207cf7155cd1f4003ebd698f0fb75f65efb862ef7f
+git/git-2.24.1.tar.gz:
+  size: 8726527
+  object_id: fd4e0cec-2837-47de-5f8e-504d2f66c69a
+  sha: sha256:ad5334956301c86841eb1e5b1bb20884a6bad89a10a6762c958220c7cf64da02
 zlib/zlib-1.2.11.tar.gz:
   size: 607698
   object_id: 49bf3bb5-dcb2-4d9d-75ce-06e5815e0559
