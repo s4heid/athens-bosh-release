@@ -32,28 +32,36 @@ jobs:
       - name: Upgrade bosh blobs
         uses: s4heid/bosh-blobs-upgrader-action@master
         env:
-          GIT_NAME: "GitHub Action"
-          GIT_EMAIL: "action@github.com"
-          GIT_UPDATE_BRANCH: blobs
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           repository: .
+      - name: Create Update Summary
+        id: summary
+        run: |
+          if git diff-index --quiet HEAD ; then
+            echo "no changes in git detected" ; exit 0
+          fi
+          echo ::set-output name=pr_body::"This is an automated pull request with updates of bosh release dependencies."
       - name: Cleanup private.yml
         if: always()
         shell: bash
         run: |
           rm -f ./config/private.yml
       - name: Run tests against bosh on docker
+        if: steps.summary.outputs.pr_body != ''
         uses: s4heid/bosh-action@master
         with:
           script: ./ci/actions/test.sh
-      - name: Pull Request
-        uses: repo-sync/pull-request@v2
-        if: success()
+      - name: Create Pull Request
+        if: steps.summary.outputs.pr_body != ''
+        uses: peter-evans/create-pull-request@v1
         with:
-          source_branch: blobs
-          destination_branch: master
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "Updating dependencies"
-          pr_body: ":robot: This is an automated pull request."
-          pr_label: "auto-update"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update bosh blobs
+          author-email: s4heid@users.noreply.github.com
+          author-name: Sebastian Heid
+          title: 'Automated bosh blobs update'
+          body: ${{ steps.summary.outputs.pr_body }}
+          labels: dependencies
+          branch: blobs
+          branch-suffix: short-commit-hash
