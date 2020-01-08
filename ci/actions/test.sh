@@ -11,7 +11,6 @@ bosh upload-stemcell \
     --version=621.5 \
     --sha1=1a18280689eb6b4a459c7924a16cbf9a7ca76043 \
     https://bosh-core-stemcells.s3-accelerate.amazonaws.com/621.5/bosh-stemcell-621.5-warden-boshlite-ubuntu-xenial-go_agent.tgz
-    stemcell_os=ubuntu-xenial
 
 export BOSH_DEPLOYMENT=athens
 export BOSH_NON_INTERACTIVE=true
@@ -22,7 +21,6 @@ bosh update-runtime-config --name=dns \
 bosh deploy \
     --ops-file=./manifests/operations/dev-ops.yml \
     --var=repo_dir="$PWD" \
-    --var=os="${stemcell_os}" \
     --vars-store=/tmp/deployment-vars.yml \
     ./manifests/athens.yml
 

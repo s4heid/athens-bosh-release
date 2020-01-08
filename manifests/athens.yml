@@ -12,7 +12,7 @@ releases:
 
 stemcells:
 - alias: default
-  os: ((os))
+  os: ubuntu-xenial
   version: latest
 
 update:
@@ -35,11 +35,9 @@ instance_groups:
   jobs:
   - name: athens
     release: athens
-    properties:
-      storage_type: disk
+    properties: {}
   vm_type: default
   stemcell: default
-  persistent_disk: 1024
   networks:
   - name: default
 - name: athens-test-errand

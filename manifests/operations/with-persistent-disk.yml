@@ -1,0 +1,8 @@
+---
+- type: replace
+  path: /instance_groups/name=athens/jobs/name=athens/properties/storage_type?
+  value: disk
+
+- type: replace
+  path: /instance_groups/name=athens/persistent_disk?
+  value: ((disk_size))

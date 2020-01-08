@@ -12,7 +12,6 @@ source "$root_dir"/scripts/utils.sh
 stemcell_name="${STEMCELL_NAME:-bosh-warden-boshlite-ubuntu-xenial-go_agent}"
 stemcell_version="${STEMCELL_VERSION:-456.30}"
 stemcell_sha1="${STEMCELL_SHA1:-61791b4d37ee3aacb9db36bb819c1fbcc4785a9e}"
-stemcell_os="${STEMCELL_OS:-ubuntu-xenial}"
 
 pushd "${root_dir}" > /dev/null
 
@@ -26,33 +25,35 @@ bosh upload-stemcell "https://bosh.io/d/stemcells/${stemcell_name}?v=${stemcell_
     --version $stemcell_version
 
 deploy_files=()
-deploy_vars=$(mktemp /tmp/aws-vars.XXXXXX); trap 'echo "Deleting $deploy_vars" 1>&2; rm -f $deploy_vars' 0 2 3 15
+deploy_vars=$(mktemp -d /tmp/aws-vars.XXXXXX); trap 'echo "Deleting $deploy_vars" 1>&2; rm -rf $deploy_vars' 0 2 3 15
 if [[ $stemcell_name == *"aws"* ]]; then
-    info "Uploading cloud config"
+    terraform output -state=ci/terraform/terraform.tfstate -json \
+        | jq 'to_entries | map({key, "value": .value.value}) | from_entries' \
+        > $deploy_vars/raw
+    default_group="$( bosh cloud-config | bosh int --path=/networks/name=default/subnets/0/cloud_properties/security_groups/0 - )"
+    jq -r --arg dg $default_group '.athens_security_groups = [.athens_security_group, $dg]' <$deploy_vars/raw >$deploy_vars/filled
 
+    info "Uploading cloud config"
     bosh update-config \
         --type=cloud \
         --name=athens \
-        --vars-file=<(terraform output -state=ci/terraform/terraform.tfstate -json | jq 'to_entries | map({key, "value": .value.value}) | from_entries') \
-        --var=default_security_group="$( bosh cloud-config | bosh int --path=/networks/name=default/subnets/0/cloud_properties/security_groups/0 - )" \
+        --vars-file=<(cat ${deploy_vars}/filled) \
         ./manifests/cloud-config.yml
 
     deploy_files+=( "--ops-file=./manifests/operations/aws-terraform-ops.yml" )
-    terraform output -state=ci/terraform/terraform.tfstate -json \
-        | jq 'to_entries | map({key, "value": .value.value}) | from_entries' \
-        > $deploy_vars
 else
     # bosh lite
-    echo "{\"external_ip\": \"10.244.0.2\"}" > $deploy_vars
+    echo "{\"external_ip\": \"10.244.0.2\"}" > ${deploy_vars}/filled
 fi
 
 info "Deploying $BOSH_DEPLOYMENT"
 bosh deploy \
     --ops-file=./manifests/operations/dev-ops.yml \
-    --ops-file=./manifests/operations/enable-tls.yml \
+    --ops-file=./manifests/operations/with-tls.yml \
+    --ops-file=./manifests/operations/with-persistent-disk.yml \
     --var=repo_dir="$PWD" \
-    --var=os=$stemcell_os \
-    --vars-file=<(cat $deploy_vars) \
+    --var=disk_size=1024 \
+    --vars-file=<(cat "${deploy_vars}"/filled) \
     "${deploy_files[@]}" \
     ./manifests/athens.yml
 
