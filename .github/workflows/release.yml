@@ -74,7 +74,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: athens/${{ steps.final_release.outputs.new_version }}
           body: |
-            **Artifacts:**
+            Artifacts:
             | sha256 | file |
             | ---------- | --- |
             | `${{ steps.final_release.outputs.sha }}` | [`athens-${{ steps.final_release.outputs.new_version }}.tgz`](https://github.com/s4heid/athens-bosh-release/releases/download/${{ github.ref }}/athens-${{ steps.final_release.outputs.new_version }}.tgz) |
