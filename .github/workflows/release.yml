@@ -1,0 +1,91 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create final bosh release
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - name: Install BOSH CLI
+        run: |
+          bosh_cli_version=6.1.1
+          mkdir -p /home/runner/work/_temp/bin
+          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 \
+            --output-document="/home/runner/work/_temp/bin/bosh" && \
+              chmod +x /home/runner/work/_temp/bin/bosh
+      - name: Create BOSH Release
+        id: final_release
+        run: |
+          new_version="$( echo "${{ github.ref }}" | sed 's#refs/tags/v##' )"
+
+          /home/runner/work/_temp/bin/bosh create-release --timestamp-version --force \
+            --tarball=./athens-${new_version}.tgz
+
+          echo ::set-output name=new_version::"$new_version"
+          echo ::set-output name=sha::"$( sha256sum ./athens-${new_version}.tgz | awk '{print $1}' )"
+      - name: Create private.yml
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set +x ; cat > ./config/private.yml <<EOF
+          ---
+          blobstore:
+            provider: s3
+            options:
+              access_key_id: $AWS_ACCESS_KEY_ID
+              secret_access_key: $AWS_SECRET_ACCESS_KEY
+          EOF
+      - name: Finalize release
+        run: |
+          /home/runner/work/_temp/bin/bosh finalize-release --sha2 --version="${{ steps.final_release.outputs.new_version }}" \
+            ./athens-${{ steps.final_release.outputs.new_version }}.tgz
+
+          if git diff --no-ext-diff --quiet --exit-code; then
+            >&2 echo "No diff detected in git." ; exit 1
+          fi
+
+          git config --local user.email "s4heid@users.noreply.github.com"
+          git config --local user.name "Sebastian Heid"
+          git add -A releases .final_builds ; git commit -m "Final release ${{ steps.final_release.outputs.new_version }}"
+      - name: Cleanup private.yml
+        if: always()
+        shell: bash
+        run: |
+          rm -f ./config/private.yml
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: athens/${{ steps.final_release.outputs.new_version }}
+          body: |
+            **Artifacts:**
+            | sha256 | file |
+            | ---------- | --- |
+            | `${{ steps.final_release.outputs.sha }}` | [`athens-${{ steps.final_release.outputs.new_version }}.tgz`](https://github.com/s4heid/athens-bosh-release/releases/download/${{ github.ref }}/athens-${{ steps.final_release.outputs.new_version }}.tgz) |
+          draft: true
+          prerelease: false
+      - name: Upload GitHub Release Assets
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./athens-${{ steps.final_release.outputs.new_version }}.tgz
+          asset_name: athens-${{ steps.final_release.outputs.new_version }}.tgz
+          asset_content_type: application/gzip
