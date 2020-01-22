@@ -3,7 +3,7 @@ name: athens
 
 releases:
 - name: athens
-  version: latest
+  version: 0.0.1
   url: git+https://github.com/s4heid/athens-bosh-release
 - name: "bpm"
   version: "1.0.4"

@@ -40,7 +40,7 @@ if [[ $stemcell_name == *"aws"* ]]; then
         --vars-file=<(cat ${deploy_vars}/filled) \
         ./manifests/cloud-config.yml
 
-    deploy_files+=( "--ops-file=./manifests/operations/aws-terraform-ops.yml" )
+    deploy_files+=( "--ops-file=./manifests/operations/aws-ops.yml" )
 else
     # bosh lite
     echo "{\"external_ip\": \"10.244.0.2\"}" > ${deploy_vars}/filled

@@ -26,3 +26,4 @@ crash.log
 *.txt
 *.tar.gz
 .envrc
+credentials.yml
