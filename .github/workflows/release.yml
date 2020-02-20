@@ -16,7 +16,7 @@ jobs:
           submodules: recursive
       - name: Install BOSH CLI
         run: |
-          bosh_cli_version=6.1.1
+          bosh_cli_version=6.2.1
           mkdir -p /home/runner/work/_temp/bin
           wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 \
             --output-document="/home/runner/work/_temp/bin/bosh" && \
@@ -25,12 +25,32 @@ jobs:
         id: final_release
         run: |
           new_version="$( echo "${{ github.ref }}" | sed 's#refs/tags/v##' )"
-
-          /home/runner/work/_temp/bin/bosh create-release --timestamp-version --force \
-            --tarball=./athens-${new_version}.tgz
-
           echo ::set-output name=new_version::"$new_version"
-          echo ::set-output name=sha::"$( sha256sum ./athens-${new_version}.tgz | awk '{print $1}' )"
+
+          mkdir tmp
+
+          if [[ -e "docs/releases/v${version}.md" ]]; then
+            sed '1{/^---$/!q;};1,/^---$/d' "docs/releases/v${version}.md" > tmp/release-body
+            echo "" >> tmp/release-body
+          fi
+
+          export filename=./athens-${new_version}.tgz
+          echo ::set-output name=filename::"$filename"
+
+          /home/runner/work/_temp/bin/bosh create-release --timestamp-version --force --tarball=$filename
+
+          cd tmp
+
+          (
+            sha=$(shasum -a 256 "$filename" | awk '{print $1}')
+            echo "**Artifacts (sha256)**"
+            echo ""
+            echo "| sha256 | file |"
+            echo "| ------ | ---- |"
+            echo "| \`$sha\` | [$filename](https://github.com/s4heid/athens-bosh-release/releases/download/${{ github.ref }}/$filename) |"
+          ) >> ./release-body
+
+          echo ::set-output name=release_body::"$( jq -rRs 'gsub("\r";"%0D")|gsub("\n";"%0A")' < ./release-body )"
       - name: Create private.yml
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -67,17 +87,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@master # https://github.com/actions/create-release/issues/38
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: athens/${{ steps.final_release.outputs.new_version }}
-          body: |
-            Artifacts:
-            | sha256 | file |
-            | ---------- | --- |
-            | `${{ steps.final_release.outputs.sha }}` | [`athens-${{ steps.final_release.outputs.new_version }}.tgz`](https://github.com/s4heid/athens-bosh-release/releases/download/${{ github.ref }}/athens-${{ steps.final_release.outputs.new_version }}.tgz) |
+          body: ${{ steps.final_release.outputs.release_body }}
           draft: true
           prerelease: false
       - name: Upload GitHub Release Assets
