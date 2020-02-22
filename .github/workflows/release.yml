@@ -11,16 +11,18 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
+      - name: Download BOSH CLI
+        uses: docker://dpb587/gget
         with:
-          submodules: recursive
+          args: --exec github.com/cloudfoundry/bosh-cli "bosh=bosh-cli-*-linux-amd64"
       - name: Install BOSH CLI
         run: |
-          bosh_cli_version=6.2.1
-          mkdir -p /home/runner/work/_temp/bin
-          wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-${bosh_cli_version}-linux-amd64 \
-            --output-document="/home/runner/work/_temp/bin/bosh" && \
-              chmod +x /home/runner/work/_temp/bin/bosh
+          mkdir -p  $GITHUB_WORKSPACE/bin
+          mv ./bosh $GITHUB_WORKSPACE/bin/
+          echo "::add-path::$GITHUB_WORKSPACE/bin"
       - name: Create BOSH Release
         id: final_release
         run: |
@@ -37,7 +39,7 @@ jobs:
           export filename=./athens-${new_version}.tgz
           echo ::set-output name=filename::"$filename"
 
-          /home/runner/work/_temp/bin/bosh create-release --timestamp-version --force --tarball=$filename
+          bosh create-release --timestamp-version --force --tarball=$filename
 
           cd tmp
 
@@ -66,7 +68,7 @@ jobs:
           EOF
       - name: Finalize release
         run: |
-          /home/runner/work/_temp/bin/bosh finalize-release --sha2 --version="${{ steps.final_release.outputs.new_version }}" \
+          bosh finalize-release --sha2 --version="${{ steps.final_release.outputs.new_version }}" \
             ./athens-${{ steps.final_release.outputs.new_version }}.tgz
 
           if git diff --no-ext-diff --quiet --exit-code; then
