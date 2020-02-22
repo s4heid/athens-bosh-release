@@ -12,8 +12,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
+      - name: Checkout submodules and fetch tags
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          git submodule update --init --recursive
       - name: Download BOSH CLI
         uses: docker://dpb587/gget
         with:
@@ -29,7 +31,7 @@ jobs:
           new_version="$( echo "${{ github.ref }}" | sed 's#refs/tags/v##' )"
           echo ::set-output name=new_version::"$new_version"
 
-          mkdir tmp
+          mkdir -p tmp
 
           if [[ -e "docs/releases/v${version}.md" ]]; then
             sed '1{/^---$/!q;};1,/^---$/d' "docs/releases/v${version}.md" > tmp/release-body
