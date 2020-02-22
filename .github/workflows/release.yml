@@ -20,9 +20,9 @@ jobs:
           args: --exec github.com/cloudfoundry/bosh-cli "bosh=bosh-cli-*-linux-amd64"
       - name: Install BOSH CLI
         run: |
-          mkdir -p  $GITHUB_WORKSPACE/bin
-          mv ./bosh $GITHUB_WORKSPACE/bin/
-          echo "::add-path::$GITHUB_WORKSPACE/bin"
+          mkdir -p  $GITHUB_WORKSPACE/tmp/bin
+          mv ./bosh $GITHUB_WORKSPACE/tmp/bin/
+          echo "::add-path::$GITHUB_WORKSPACE/tmp/bin"
       - name: Create BOSH Release
         id: final_release
         run: |
