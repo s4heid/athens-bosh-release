@@ -33,12 +33,12 @@ jobs:
 
           mkdir -p tmp
 
-          if [[ -e "docs/releases/v${version}.md" ]]; then
-            sed '1{/^---$/!q;};1,/^---$/d' "docs/releases/v${version}.md" > tmp/release-body
+          if [[ -e "docs/releases/v${new_version}.md" ]]; then
+            sed '1{/^---$/!q;};1,/^---$/d' "docs/releases/v${new_version}.md" > tmp/release-body
             echo "" >> tmp/release-body
           fi
 
-          export filename=./athens-${new_version}.tgz
+          export filename=athens-${new_version}.tgz
           echo ::set-output name=filename::"$filename"
 
           bosh create-release --timestamp-version --force --tarball=$filename
@@ -46,13 +46,15 @@ jobs:
           cd tmp
 
           (
-            sha=$(shasum -a 256 "$filename" | awk '{print $1}')
+            sha="$(shasum -a 256 "$filename" | cut -d " " -f 1)"
             echo "**Artifacts (sha256)**"
             echo ""
             echo "| sha256 | file |"
             echo "| ------ | ---- |"
-            echo "| \`$sha\` | [$filename](https://github.com/s4heid/athens-bosh-release/releases/download/${{ github.ref }}/$filename) |"
+            echo "| \`"${sha}"\` | [$filename](https://github.com/s4heid/athens-bosh-release/releases/download/${{ github.ref }}/$filename) |"
           ) >> ./release-body
+
+          cat ./release-body
 
           echo ::set-output name=release_body::"$( jq -rRs 'gsub("\r";"%0D")|gsub("\n";"%0A")' < ./release-body )"
       - name: Create private.yml
