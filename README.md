@@ -15,7 +15,7 @@ This BOSH release provides jobs for running the [Athens](https://docs.gomods.io)
 Upload the bosh release to your director from the command line with the `upload-releases` command:
 
 ```sh
-$ bosh upload-release --name=athens --version=0.0.1 \
+$ bosh upload-release --name=athens --version=0.1.1 \
     git+https://github.com/s4heid/athens-bosh-release
 ```
 
@@ -24,7 +24,7 @@ Or reference it in the `releases` section of your deployment manifest:
 ```yaml
 releases:
 - name: athens
-  version: 0.0.1
+  version: 0.1.1
   url: git+https://github.com/s4heid/athens-bosh-release
 ```
 
