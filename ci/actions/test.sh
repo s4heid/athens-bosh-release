@@ -2,15 +2,15 @@
 
 set -eu
 
-/usr/local/bin/start-bosh -o $PWD/manifests/operations/enable-dns.yml
+. /usr/local/bin/start-bosh -o $PWD/manifests/operations/enable-dns.yml
 
 source /tmp/local-bosh/director/env
 
 bosh upload-stemcell \
     --name=bosh-warden-boshlite-ubuntu-xenial-go_agent \
-    --version=621.5 \
-    --sha1=1a18280689eb6b4a459c7924a16cbf9a7ca76043 \
-    https://bosh-core-stemcells.s3-accelerate.amazonaws.com/621.5/bosh-stemcell-621.5-warden-boshlite-ubuntu-xenial-go_agent.tgz
+    --version=621.71 \
+    --sha1=6190d7f100f9d48fe425c2d69ba93d7137e6bc19 \
+    https://bosh-core-stemcells.s3-accelerate.amazonaws.com/621.71/bosh-stemcell-621.71-warden-boshlite-ubuntu-xenial-go_agent.tgz
 
 export BOSH_DEPLOYMENT=athens
 export BOSH_NON_INTERACTIVE=true
